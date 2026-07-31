@@ -9,68 +9,187 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
+import { Route as AuthedFFridgeIdIndexRouteImport } from './routes/_authed/f/$fridgeId/index'
+import { Route as AuthedFFridgeIdProductProductIdRouteImport } from './routes/_authed/f/$fridgeId/product.$productId'
+import { Route as AuthedFFridgeIdSaleSaleIdRouteImport } from './routes/_authed/f/$fridgeId/sale.$saleId'
 
-const IndexRoute = IndexRouteImport.update({
+const AuthedRouteRoute = AuthedRouteRouteImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
+const AuthedAccountRoute = AuthedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
+const AuthedFFridgeIdIndexRoute = AuthedFFridgeIdIndexRouteImport.update({
+  id: '/f/$fridgeId/',
+  path: '/f/$fridgeId/',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+const AuthedFFridgeIdProductProductIdRoute =
+  AuthedFFridgeIdProductProductIdRouteImport.update({
+    id: '/f/$fridgeId/product/$productId',
+    path: '/f/$fridgeId/product/$productId',
+    getParentRoute: () => AuthedRouteRoute,
+  } as any)
+const AuthedFFridgeIdSaleSaleIdRoute =
+  AuthedFFridgeIdSaleSaleIdRouteImport.update({
+    id: '/f/$fridgeId/sale/$saleId',
+    path: '/f/$fridgeId/sale/$saleId',
+    getParentRoute: () => AuthedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/': typeof AuthedIndexRoute
+  '/login': typeof LoginRoute
+  '/account': typeof AuthedAccountRoute
+  '/f/$fridgeId/': typeof AuthedFFridgeIdIndexRoute
+  '/f/$fridgeId/product/$productId': typeof AuthedFFridgeIdProductProductIdRoute
+  '/f/$fridgeId/sale/$saleId': typeof AuthedFFridgeIdSaleSaleIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/login': typeof LoginRoute
+  '/account': typeof AuthedAccountRoute
+  '/': typeof AuthedIndexRoute
+  '/f/$fridgeId': typeof AuthedFFridgeIdIndexRoute
+  '/f/$fridgeId/product/$productId': typeof AuthedFFridgeIdProductProductIdRoute
+  '/f/$fridgeId/sale/$saleId': typeof AuthedFFridgeIdSaleSaleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authed': typeof AuthedRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_authed/account': typeof AuthedAccountRoute
+  '/_authed/': typeof AuthedIndexRoute
+  '/_authed/f/$fridgeId/': typeof AuthedFFridgeIdIndexRoute
+  '/_authed/f/$fridgeId/product/$productId': typeof AuthedFFridgeIdProductProductIdRoute
+  '/_authed/f/$fridgeId/sale/$saleId': typeof AuthedFFridgeIdSaleSaleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/account'
+    | '/f/$fridgeId/'
+    | '/f/$fridgeId/product/$productId'
+    | '/f/$fridgeId/sale/$saleId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/auth/$'
-  id: '__root__' | '/' | '/api/auth/$'
+  to:
+    | '/login'
+    | '/account'
+    | '/'
+    | '/f/$fridgeId'
+    | '/f/$fridgeId/product/$productId'
+    | '/f/$fridgeId/sale/$saleId'
+  id:
+    | '__root__'
+    | '/_authed'
+    | '/login'
+    | '/_authed/account'
+    | '/_authed/'
+    | '/_authed/f/$fridgeId/'
+    | '/_authed/f/$fridgeId/product/$productId'
+    | '/_authed/f/$fridgeId/sale/$saleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_authed': {
+      id: '/_authed'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authed/': {
+      id: '/_authed/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedIndexRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
+    '/_authed/account': {
+      id: '/_authed/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthedAccountRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
+    '/_authed/f/$fridgeId/': {
+      id: '/_authed/f/$fridgeId/'
+      path: '/f/$fridgeId'
+      fullPath: '/f/$fridgeId/'
+      preLoaderRoute: typeof AuthedFFridgeIdIndexRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
+    '/_authed/f/$fridgeId/product/$productId': {
+      id: '/_authed/f/$fridgeId/product/$productId'
+      path: '/f/$fridgeId/product/$productId'
+      fullPath: '/f/$fridgeId/product/$productId'
+      preLoaderRoute: typeof AuthedFFridgeIdProductProductIdRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
+    '/_authed/f/$fridgeId/sale/$saleId': {
+      id: '/_authed/f/$fridgeId/sale/$saleId'
+      path: '/f/$fridgeId/sale/$saleId'
+      fullPath: '/f/$fridgeId/sale/$saleId'
+      preLoaderRoute: typeof AuthedFFridgeIdSaleSaleIdRouteImport
+      parentRoute: typeof AuthedRouteRoute
     }
   }
 }
 
+interface AuthedRouteRouteChildren {
+  AuthedAccountRoute: typeof AuthedAccountRoute
+  AuthedIndexRoute: typeof AuthedIndexRoute
+  AuthedFFridgeIdIndexRoute: typeof AuthedFFridgeIdIndexRoute
+  AuthedFFridgeIdProductProductIdRoute: typeof AuthedFFridgeIdProductProductIdRoute
+  AuthedFFridgeIdSaleSaleIdRoute: typeof AuthedFFridgeIdSaleSaleIdRoute
+}
+
+const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
+  AuthedAccountRoute: AuthedAccountRoute,
+  AuthedIndexRoute: AuthedIndexRoute,
+  AuthedFFridgeIdIndexRoute: AuthedFFridgeIdIndexRoute,
+  AuthedFFridgeIdProductProductIdRoute: AuthedFFridgeIdProductProductIdRoute,
+  AuthedFFridgeIdSaleSaleIdRoute: AuthedFFridgeIdSaleSaleIdRoute,
+}
+
+const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
+  AuthedRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  AuthedRouteRoute: AuthedRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-31T02:53:41Z",
+  "title": "Design System: Smart Fridge",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "primary", "displayName": "Near-Black Ink", "canonical": "#202020", "tonalRamp": ["#0f0f0f", "#1a1a1a", "#202020", "#3a3a3a", "#5c5c5c", "#8a8a8a", "#bdbdbd", "#e8e8e8"] },
+      "cream": { "role": "secondary", "displayName": "Warm Cream", "canonical": "#ffe8ae", "tonalRamp": ["#4a3f1f", "#7a6733", "#a6893f", "#d4b060", "#ffd67d", "#ffe8ae", "#fff2cf", "#fffaf0"] },
+      "mint": { "role": "tertiary", "displayName": "Soft Mint", "canonical": "#eafcd7", "tonalRamp": ["#1d3313", "#2f5220", "#4a7a34", "#78ab5c", "#a6d68c", "#c8ecb1", "#eafcd7", "#f7fdee"] },
+      "lavender": { "role": "tertiary", "displayName": "Pale Lavender", "canonical": "#e8e9ff", "tonalRamp": ["#1e1f3d", "#2f3163", "#494c94", "#7376c0", "#9fa1de", "#c3c5ef", "#e8e9ff", "#f5f5ff"] },
+      "blush": { "role": "tertiary", "displayName": "Blush Pink", "canonical": "#ffcdca", "tonalRamp": ["#4a1f1d", "#7a332f", "#b04d47", "#e07971", "#ffa79f", "#ffc0ba", "#ffcdca", "#ffe8e6"] },
+      "sand": { "role": "tertiary", "displayName": "Warm Sand", "canonical": "#f2e1d5", "tonalRamp": ["#33281f", "#4f3f30", "#7a6249", "#a3846a", "#c7ab8f", "#e2c9b3", "#f2e1d5", "#faf3ec"] },
+      "paper": { "role": "neutral", "displayName": "Paper White", "canonical": "#ffffff", "tonalRamp": ["#161616", "#3a3a3a", "#6b6b6b", "#9a9a9a", "#c4c4c4", "#e5e5e5", "#f5f5f5", "#ffffff"] },
+      "muted": { "role": "neutral", "displayName": "Muted Gray", "canonical": "#f5f5f3", "tonalRamp": ["#1e1e1d", "#3a3a38", "#5c5c59", "#8a8a86", "#b5b5b0", "#dcdcd9", "#f5f5f3", "#fbfbfa"] },
+      "destructive": { "role": "error", "displayName": "Alert Red", "canonical": "#d94f4f", "tonalRamp": ["#3d1414", "#5e1f1f", "#8f2f2f", "#c04141", "#d94f4f", "#e37878", "#eea6a6", "#f9dcdc"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Screen-level greetings and the login headline; extrabold Rubik at the largest sizes." },
+      "headline": { "displayName": "Headline", "purpose": "Product-detail title, unlock confirmation, section titles." },
+      "title": { "displayName": "Title", "purpose": "Product name on cards, account name." },
+      "body": { "displayName": "Body", "purpose": "Descriptions and supporting copy." },
+      "label": { "displayName": "Label", "purpose": "Pills, badges, form labels, price tags — never uppercase/tracked." }
+    },
+    "shadows": [
+      { "name": "shell-elevation", "value": "0 24px 60px -24px rgba(0,0,0,0.25)", "purpose": "PhoneShell card at sm+ breakpoints, separating the device silhouette from the muted page." },
+      { "name": "nav-float", "value": "0 12px 32px -8px rgba(0,0,0,0.35)", "purpose": "Floating pill bottom nav, keeping it above scrolling content." },
+      { "name": "chip-lift", "value": "0 8px 24px -6px rgba(0,0,0,0.18)", "purpose": "Description chip overlapping the product-detail hero image." }
+    ],
+    "motion": [],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Full-width pill CTA, ink fill, used for sign-in, payment, and confirmation actions.",
+      "html": "<button class=\"ds-btn-primary\">Make Payment</button>",
+      "css": ".ds-btn-primary { background: #202020; color: #ffffff; height: 3.25rem; padding: 0 1.5rem; border-radius: 9999px; border: none; font-family: 'Rubik', sans-serif; font-weight: 600; font-size: 1rem; transition: opacity 0.2s; } .ds-btn-primary:hover { opacity: 0.9; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(32,32,32,0.5); } .ds-btn-primary:disabled { opacity: 0.7; }"
+    },
+    {
+      "name": "Outline Icon Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Circular secondary action button (back, filter, sign-out) with a hairline border.",
+      "html": "<button class=\"ds-btn-outline\" aria-label=\"Back\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"15 18 9 12 15 6\"/></svg></button>",
+      "css": ".ds-btn-outline { display: flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; border: 1px solid #ececea; background: #ffffff; color: #202020; transition: background 0.2s; } .ds-btn-outline:hover { background: #f5f5f3; } .ds-btn-outline:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(32,32,32,0.5); }"
+    },
+    {
+      "name": "Category Pill",
+      "kind": "chip",
+      "refersTo": "category-pill-active",
+      "description": "Horizontally scrolling filter pill; active state inverts to ink fill.",
+      "html": "<div class=\"ds-pill-row\"><button class=\"ds-pill ds-pill-active\">All</button><button class=\"ds-pill\">Snacks</button><button class=\"ds-pill\">Drinks</button></div>",
+      "css": ".ds-pill-row { display: flex; gap: 0.5rem; overflow-x: auto; } .ds-pill { flex-shrink: 0; border: none; border-radius: 9999px; padding: 0.5rem 1rem; font-family: 'Rubik', sans-serif; font-weight: 600; font-size: 0.875rem; background: #f5f5f3; color: #6b6b68; transition: background 0.2s, color 0.2s; } .ds-pill:hover { background: #ececea; } .ds-pill-active { background: #202020; color: #ffffff; } .ds-pill:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(32,32,32,0.5); }"
+    },
+    {
+      "name": "Product Tile",
+      "kind": "card",
+      "refersTo": "product-card",
+      "description": "Square pastel-tone field with a centered placeholder icon, name/description/price below. Signature browse-grid component.",
+      "html": "<a class=\"ds-tile\" href=\"#\"><div class=\"ds-tile-image ds-tile-mint\"><svg width=\"56\" height=\"56\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7h18l-1 13H4L3 7z\"/><path d=\"M8 7V5a4 4 0 0 1 8 0v2\"/></svg><span class=\"ds-tile-badge\">4 left</span></div><div class=\"ds-tile-info\"><div><p class=\"ds-tile-name\">Club Sandwich</p><p class=\"ds-tile-desc\">Turkey, bacon &amp; greens</p></div><p class=\"ds-tile-price\">$18.50</p></div></a>",
+      "css": ".ds-tile { display: flex; flex-direction: column; overflow: hidden; border-radius: 1.5rem; background: #ffffff; text-decoration: none; color: inherit; transition: transform 0.15s; } .ds-tile:active { transform: scale(0.98); } .ds-tile-image { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 1; color: rgba(32,32,32,0.8); } .ds-tile-mint { background: #eafcd7; } .ds-tile-badge { position: absolute; top: 0.625rem; right: 0.625rem; border-radius: 9999px; background: rgba(255,255,255,0.8); padding: 0.125rem 0.5rem; font-size: 0.625rem; font-weight: 600; color: rgba(32,32,32,0.7); } .ds-tile-info { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; padding: 0.625rem 0.125rem 0; } .ds-tile-name { font-size: 0.875rem; font-weight: 600; color: #202020; } .ds-tile-desc { font-size: 0.75rem; color: #6b6b68; } .ds-tile-price { font-size: 0.875rem; font-weight: 700; color: #202020; }"
+    },
+    {
+      "name": "Bottom Tab Nav",
+      "kind": "nav",
+      "refersTo": "category-pill-active",
+      "description": "Floating pill nav with two circular icon destinations (Home, Account); active destination inverts to a paper-filled circle.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-item-active\" href=\"#\" aria-label=\"Home\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\"><path d=\"M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg></a><a class=\"ds-nav-item\" href=\"#\" aria-label=\"Account\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6\"/></svg></a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 0.5rem; border-radius: 9999px; background: #202020; padding: 0.625rem 0.75rem; box-shadow: 0 12px 32px -8px rgba(0,0,0,0.35); width: fit-content; } .ds-nav-item { display: flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; color: rgba(255,255,255,0.7); transition: color 0.2s, background 0.2s; } .ds-nav-item:hover { color: #ffffff; } .ds-nav-item-active { background: #ffffff; color: #202020; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Borderless muted-fill field used in the login form.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"email\">Email</label><input class=\"ds-input\" id=\"email\" type=\"email\" placeholder=\"you@example.com\" /></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 0.375rem; } .ds-field-label { font-size: 0.75rem; font-weight: 600; color: #6b6b68; font-family: 'Rubik', sans-serif; } .ds-input { height: 3rem; width: 100%; border: none; border-radius: 0.875rem; background: #f5f5f3; padding: 0 1rem; font-family: 'Rubik', sans-serif; font-size: 0.875rem; color: #202020; } .ds-input::placeholder { color: #6b6b68; } .ds-input:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(32,32,32,0.5); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Vending Wallet",
+    "overview": "Smart Fridge compresses a physical vending purchase into a single-handed phone flow: near-black ink typeset in Rubik's confident geometric weight sits on a cream-and-white ground, with pastel-coded tiles standing in for a product catalog that doesn't exist yet. There is no browsing chrome, no cart, no multi-step checkout — every screen is a full-bleed phone card carrying exactly one job (browse, decide, pay, unlock). The palette is loud in small, specific places (a pill button, a stock badge, a tone field) and otherwise gets out of the way of black text on white. The system was brief-pinned from a Figma type/color spec sheet and three snack-vending app screens; the shipped build honors that pinning almost exactly — same ink/cream/pastel palette, same pill-everything form language, same stepper and bottom-tab patterns — with the one durable adaptation being PhoneShell, which turns the reference's implicit \"this is a phone app\" into an explicit, enforced layout rule for a real responsive web build.",
+    "keyCharacteristics": [
+      "Near-black ink (#202020) on white/cream grounds; color is reserved for tone fields, pills, and the primary CTA, never for body text.",
+      "Rubik at heavy weights (700-800) for every heading; body and label text stay at regular/semibold Rubik.",
+      "Pill radius (full) on every interactive control: buttons, category filters, nav, badges, quantity stepper.",
+      "Large corner radius (1.25rem+) on every card, sheet, and product tile — nothing in the system has a sharp corner.",
+      "One phone-shaped canvas per screen (PhoneShell), never a fluid desktop grid."
+    ],
+    "rules": [
+      { "name": "The Ink-Only-Text Rule", "body": "Body and heading text are always --foreground (near-black) or --muted-foreground; pastel tokens never carry text, only fills behind icons or full-screen state grounds.", "section": "colors" },
+      { "name": "The One Pastel Per Surface Rule", "body": "Any given tile or screen uses exactly one tone color as a flat fill — tones are never combined, gradiented, or layered on the same surface.", "section": "colors" },
+      { "name": "The Two-Weight Rule", "body": "Every text element on screen resolves to either extrabold (numbers, headings, totals) or a lighter 400-600 weight (everything else) — there is no mid-weight (500-600 headline) register in use.", "section": "typography" },
+      { "name": "The Structural-Only Shadow Rule", "body": "Shadows appear only on elements that are physically floating above another layer (the shell, the nav, the overlapping chip) — cards, tiles, and buttons at rest are flat.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep every route inside PhoneShell — full-bleed under sm, centered max-w-md card with 2.5rem corners and ambient shadow at sm+. This is the system's responsive strategy, not a temporary constraint.",
+      "Do use rounded-full for every tappable control (buttons, pills, badges, nav, stepper) and reserve large-but-not-full radii (rounded-3xl/rounded-[2rem]) for image-bearing containers.",
+      "Do assign one pastel tone (mint/lavender/blush/sand/cream) per product/state as a flat fill — never gradient or combine tones on one surface.",
+      "Do keep shadows structural: only on the shell, the floating nav, and elements that visually overlap another layer.",
+      "Do set headings and numerals in Rubik 800; leave everything else at 400-600."
+    ],
+    "donts": [
+      "Don't introduce a fluid, multi-column desktop layout — this is a phone-only product by design (PRODUCT.md), and PhoneShell's fixed-card behavior at wide viewports is the intended terminal state, not a gap to \"fix\" with a responsive grid.",
+      "Don't put text on a pastel tone field — tones are backgrounds for icon placeholders and full-screen state grounds only, never a text-bearing surface.",
+      "Don't add a third bottom-nav destination or duplicate an existing destination (Home/Account) — the nav was deliberately reduced to two non-overlapping destinations.",
+      "Don't add uppercase, letter-spaced \"kicker\" or eyebrow labels above headings — the type system has no tracked small-caps register anywhere in the shipped build; labels are inline chips/pills, not standalone eyebrow text.",
+      "Don't add hard-offset, outlined \"neobrutalist\" shadows (flat black offset borders) — this world's only shadow vocabulary is soft, diffuse, and structural (see Elevation & Depth); it is not a neobrutalist system."
+    ]
+  }
+}
