@@ -206,8 +206,29 @@ A square pastel-tone field with a centered `lucide-react` line icon (stroke 1.5,
 - **Do** set headings and numerals in Rubik 800; leave everything else at 400-600.
 
 ### Don't:
-- **Don't** introduce a fluid, multi-column desktop layout — this is a phone-only product by design (PRODUCT.md), and PhoneShell's fixed-card behavior at wide viewports is the intended terminal state, not a gap to "fix" with a responsive grid.
+- **Don't** introduce a fluid, multi-column desktop layout **on the customer (`USER`) surface** — that surface is phone-only by design (PRODUCT.md), and PhoneShell's fixed-card behavior at wide viewports is its intended terminal state, not a gap to "fix" with a responsive grid. This rule does not extend to the `MASTER` admin surface, a deliberate second world documented in "Admin Surface (Master back office)" below — desktop, fluid, data-dense by design, for a different audience and mode.
 - **Don't** put text on a pastel tone field — tones are backgrounds for icon placeholders and full-screen state grounds only, never a text-bearing surface.
 - **Don't** add a third bottom-nav destination or duplicate an existing destination (Home/Account) — the nav was deliberately reduced to two non-overlapping destinations.
 - **Don't** add uppercase, letter-spaced "kicker" or eyebrow labels above headings — the type system has no tracked small-caps register anywhere in the shipped build; labels are inline chips/pills, not standalone eyebrow text.
 - **Don't** add hard-offset, outlined "neobrutalist" shadows (flat black offset borders) — this world's only shadow vocabulary is soft, diffuse, and structural (see Elevation & Depth); it is not a neobrutalist system.
+
+## Admin Surface (Master back office)
+
+A second, deliberate world alongside the customer PhoneShell flow, built for the `MASTER` role (PRODUCT.md) — a small internal team on desktop managing the fridge fleet: creating/editing fridges, assigning `ADMIN` owners, managing per-fridge products, reading cross-fleet sales and analytics, and doing light support (manual door-open, deactivation). Auto-routed by role immediately after login (`/master`); `USER`/`ADMIN` never see it and `MASTER` never sees the customer flow.
+
+**Same brand, different register.** The admin surface inherits DESIGN.md's palette (ink/paper/muted/border, the five pastel tones used sparingly as stat-tile and chart fills), Rubik type, and the pill-control/large-radius shape language above — but trades PhoneShell's single phone-card constraint for a fluid, desktop-first, data-dense Operate layout: a fixed 16rem sidebar (nav + user menu) and a fluid content column (`max-w-[1400px]`), because this audience's job is scanning tables and comparing numbers, not a one-handed tap flow.
+
+**Structural direction (per `new-work.md`'s surface concept-seed roll, not a default admin-panel choice):** the confirmed landing is a single continuous Fridges page — no separate fridge-detail route. Selecting a fridge expands its table row in place into a tabbed panel (Produtos / Porta / Analytics) rather than navigating away, keeping fleet-wide awareness visible while working one fridge. This is the surface's one deliberate structural departure from the "sidebar + table + detail page" pattern every admin panel defaults to.
+
+### Components (admin-specific)
+- **Sidebar nav:** `rounded-full` active/inactive pill items (same active-pill logic as the customer bottom nav and category pills), ink fill on the active route.
+- **Tables:** shadcn `table` primitives, `rounded-3xl border-border` container, row click expands/navigates; no card-per-row pattern — data density over decoration.
+- **Forms:** shadcn `dialog` (create/edit fridge, create/edit product) reusing `FormInputField` and the `bg-muted rounded-2xl` input style from the customer login form — same field language, admin-scale forms.
+- **Destructive/physical actions:** every deactivate and the manual door-open action route through `ConfirmAction` (shadcn `alert-dialog`) — these mutate real records or open a real physical door, never a bare button.
+- **Analytics:** stat tiles reuse pastel tone fills (mint = volume, lavender = revenue) at admin scale; period/peak-hour charts are flat CSS bar charts in mint/lavender, no charting library, keeping the "flat fills, no gradients" rule from the customer world.
+- **`paymentCredential` handling:** always a blank password-style field, never pre-filled (the API never returns it) — edit mode shows a "change credential" disclosure plus an explicit "remove credential" checkbox rather than implying a value exists.
+
+### Don't:
+- **Don't** wrap `/master/*` routes in `PhoneShell` — see the Layout "Don't" above.
+- **Don't** show or imply a current `paymentCredential` value anywhere in the fridge form.
+- **Don't** add a bare delete button for fridges/products/door-open without routing through `ConfirmAction` — these are real, consequential actions.

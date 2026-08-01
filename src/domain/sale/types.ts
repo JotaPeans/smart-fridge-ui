@@ -10,6 +10,15 @@ export const SaleStatusSchema = z.enum([
 ])
 export type SaleStatus = z.infer<typeof SaleStatusSchema>
 
+export const SALE_STATUS_LABEL: Record<SaleStatus, string> = {
+  AWAITING_PAYMENT: 'Aguardando pagamento',
+  PAID: 'Pago',
+  DOOR_OPEN: 'Porta aberta',
+  DOOR_CLOSED: 'Porta fechada',
+  COMPLETED: 'Concluído',
+  CANCELLED: 'Cancelado',
+}
+
 export const SaleItemSchema = z.object({
   id: z.string(),
   quantity: z.number(),
@@ -35,3 +44,35 @@ export const SaleResponseSchema = z.object({
 export type SaleResponseType = z.infer<typeof SaleResponseSchema>
 
 export const TERMINAL_SALE_STATUSES: SaleStatus[] = ['COMPLETED', 'CANCELLED']
+
+export interface AnalyticsFilters {
+  fridgeId?: string
+  startDate?: string
+  endDate?: string
+}
+
+export const ByPeriodEntrySchema = z.object({
+  period: z.string(),
+  count: z.number(),
+  totalAmount: z.number(),
+})
+export type ByPeriodEntryType = z.infer<typeof ByPeriodEntrySchema>
+
+export const VolumeSchema = z.object({
+  count: z.number(),
+  totalAmount: z.number(),
+})
+export type VolumeType = z.infer<typeof VolumeSchema>
+
+export const TopProductSchema = z.object({
+  productId: z.string(),
+  productName: z.string(),
+  quantitySold: z.number(),
+})
+export type TopProductType = z.infer<typeof TopProductSchema>
+
+export const PeakHourSchema = z.object({
+  hour: z.number(),
+  count: z.number(),
+})
+export type PeakHourType = z.infer<typeof PeakHourSchema>

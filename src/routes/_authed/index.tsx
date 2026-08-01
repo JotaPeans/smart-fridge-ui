@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { QrCode, Refrigerator } from 'lucide-react'
 import { BottomNav } from '#/components/site/bottom-nav.tsx'
@@ -10,14 +10,30 @@ import { useMe } from '#/domain/user/query.ts'
 export const Route = createFileRoute('/_authed/')({ component: FridgeEntry })
 
 function FridgeEntry() {
-  const { data: user } = useMe()
+  const { data: user, isPending } = useMe()
   const navigate = useNavigate()
   const [fridgeId, setFridgeId] = useState('')
+  const redirectedRef = useRef(false)
+
+  useEffect(() => {
+    if (user?.role === 'MASTER' && !redirectedRef.current) {
+      redirectedRef.current = true
+      navigate({ to: '/master' })
+    }
+  }, [user, navigate])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!fridgeId.trim()) return
     navigate({ to: '/f/$fridgeId', params: { fridgeId: fridgeId.trim() } })
+  }
+
+  if (isPending || user?.role === 'MASTER') {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-background">
+        <div className="size-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
+      </div>
+    )
   }
 
   const firstName = user?.name?.split(' ')[0]

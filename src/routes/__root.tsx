@@ -1,6 +1,7 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '#/components/ui/sonner.tsx'
+import { TooltipProvider } from '#/components/ui/tooltip.tsx'
 import { queryClient } from '#/lib/query-client.ts'
 
 import appCss from '../styles.css?url'
@@ -45,8 +46,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md.
         */}
         <QueryClientProvider client={queryClient}>
-          {children}
-          <Toaster position="top-center" richColors />
+          <TooltipProvider delayDuration={200}>
+            {children}
+            <Toaster position="top-center" richColors />
+          </TooltipProvider>
         </QueryClientProvider>
         <Scripts />
       </body>

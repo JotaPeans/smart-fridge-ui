@@ -1,13 +1,32 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
-import { getSale, listSales } from './api.ts'
+import {
+  getPeakHours,
+  getSale,
+  getSalesByPeriod,
+  getSalesVolume,
+  getTopProducts,
+  listSales,
+} from './api.ts'
 import { TERMINAL_SALE_STATUSES } from './types.ts'
+import type { AnalyticsFilters } from './types.ts'
 
 export const useSales = () =>
   useQuery({
     queryKey: ['sales'],
     queryFn: async () => {
       const { data, error } = await listSales()
+      if (error) throw error
+      return data
+    },
+    staleTime: 1000 * 30,
+  })
+
+export const useSalesList = (page: number, pageSize: number) =>
+  useQuery({
+    queryKey: ['sales', 'list', page, pageSize],
+    queryFn: async () => {
+      const { data, error } = await listSales(page, pageSize)
       if (error) throw error
       return data
     },
@@ -49,3 +68,50 @@ export function useSalePolling(id: string) {
 
   return { ...query, timedOut }
 }
+
+export const useSalesByPeriod = (
+  filters: AnalyticsFilters,
+  groupBy: 'day' | 'month' | 'year',
+) =>
+  useQuery({
+    queryKey: ['analytics', 'by-period', filters, groupBy],
+    queryFn: async () => {
+      const { data, error } = await getSalesByPeriod(filters, groupBy)
+      if (error) throw error
+      return data
+    },
+    staleTime: 1000 * 30,
+  })
+
+export const useSalesVolume = (filters: AnalyticsFilters) =>
+  useQuery({
+    queryKey: ['analytics', 'volume', filters],
+    queryFn: async () => {
+      const { data, error } = await getSalesVolume(filters)
+      if (error) throw error
+      return data
+    },
+    staleTime: 1000 * 30,
+  })
+
+export const useTopProducts = (filters: AnalyticsFilters, limit: number) =>
+  useQuery({
+    queryKey: ['analytics', 'top-products', filters, limit],
+    queryFn: async () => {
+      const { data, error } = await getTopProducts(filters, limit)
+      if (error) throw error
+      return data
+    },
+    staleTime: 1000 * 30,
+  })
+
+export const usePeakHours = (filters: AnalyticsFilters) =>
+  useQuery({
+    queryKey: ['analytics', 'peak-hours', filters],
+    queryFn: async () => {
+      const { data, error } = await getPeakHours(filters)
+      if (error) throw error
+      return data
+    },
+    staleTime: 1000 * 30,
+  })

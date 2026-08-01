@@ -5,18 +5,9 @@ import { PhoneShell } from '#/components/site/phone-shell.tsx'
 import { authClient } from '#/lib/auth-client.ts'
 import { useMe } from '#/domain/user/query.ts'
 import { useSales } from '#/domain/sale/query.ts'
-import type { SaleStatus } from '#/domain/sale/types.ts'
+import { SALE_STATUS_LABEL } from '#/domain/sale/types.ts'
 
 export const Route = createFileRoute('/_authed/account')({ component: Account })
-
-const STATUS_LABEL: Record<SaleStatus, string> = {
-  AWAITING_PAYMENT: 'Aguardando pagamento',
-  PAID: 'Pago',
-  DOOR_OPEN: 'Porta aberta',
-  DOOR_CLOSED: 'Porta fechada',
-  COMPLETED: 'Concluído',
-  CANCELLED: 'Cancelado',
-}
 
 function Account() {
   const { data: user } = useMe()
@@ -71,7 +62,7 @@ function Account() {
                 <p className="text-sm font-semibold text-foreground">
                   {sale.items.reduce((n, item) => n + item.quantity, 0)} item(ns)
                 </p>
-                <p className="text-xs text-muted-foreground">{STATUS_LABEL[sale.status]}</p>
+                <p className="text-xs text-muted-foreground">{SALE_STATUS_LABEL[sale.status]}</p>
               </div>
               <p className="shrink-0 text-sm font-bold text-foreground">
                 R$ {sale.totalAmount.toFixed(2)}
