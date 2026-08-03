@@ -212,13 +212,15 @@ A square pastel-tone field with a centered `lucide-react` line icon (stroke 1.5,
 - **Don't** add uppercase, letter-spaced "kicker" or eyebrow labels above headings — the type system has no tracked small-caps register anywhere in the shipped build; labels are inline chips/pills, not standalone eyebrow text.
 - **Don't** add hard-offset, outlined "neobrutalist" shadows (flat black offset borders) — this world's only shadow vocabulary is soft, diffuse, and structural (see Elevation & Depth); it is not a neobrutalist system.
 
-## Admin Surface (Master back office)
+## Admin Surface (Master + Admin back office)
 
-A second, deliberate world alongside the customer PhoneShell flow, built for the `MASTER` role (PRODUCT.md) — a small internal team on desktop managing the fridge fleet: creating/editing fridges, assigning `ADMIN` owners, managing per-fridge products, reading cross-fleet sales and analytics, and doing light support (manual door-open, deactivation). Auto-routed by role immediately after login (`/master`); `USER`/`ADMIN` never see it and `MASTER` never sees the customer flow.
+A second, deliberate world alongside the customer PhoneShell flow, shared by two roles at two permission levels (PRODUCT.md): `MASTER` — a small internal team on desktop managing the whole fridge fleet: creating/editing/deactivating any fridge, assigning `ADMIN` owners, managing per-fridge products, reading cross-fleet sales and analytics, an admins directory, and manual door-open — and `ADMIN` — an owner of one or more fridges, auto-routed to `/admin` instead of `/master`, seeing the identical world scoped to only their own fridges: they can edit (but not create or deactivate) their fridge, fully manage its products, open its door, and read its sales/analytics, with no admins-directory access. The backend scopes list/detail data server-side (an `ADMIN`'s `GET /fridge/list` only ever returns their own); the client's job is hiding actions that role can't call (create/deactivate fridge, the admins nav item) and hiding the admin-owner picker on their own fridge's edit form, not re-filtering data. Auto-routed by role immediately after login (`/master` or `/admin`); `USER` never sees either, and neither back-office role ever sees the customer flow.
 
 **Same brand, different register.** The admin surface inherits DESIGN.md's palette (ink/paper/muted/border, the five pastel tones used sparingly as stat-tile and chart fills), Rubik type, and the pill-control/large-radius shape language above — but trades PhoneShell's single phone-card constraint for a fluid, desktop-first, data-dense Operate layout: a fixed 16rem sidebar (nav + user menu) and a fluid content column (`max-w-[1400px]`), because this audience's job is scanning tables and comparing numbers, not a one-handed tap flow.
 
-**Structural direction (per `new-work.md`'s surface concept-seed roll, not a default admin-panel choice):** the confirmed landing is a single continuous Fridges page — no separate fridge-detail route. Selecting a fridge expands its table row in place into a tabbed panel (Produtos / Porta / Analytics) rather than navigating away, keeping fleet-wide awareness visible while working one fridge. This is the surface's one deliberate structural departure from the "sidebar + table + detail page" pattern every admin panel defaults to.
+**Structural direction (per `new-work.md`'s surface concept-seed roll, not a default admin-panel choice):** the Fridges page is a single continuous list — no separate fridge-detail route. Selecting a fridge expands its table row in place into a tabbed panel (Produtos / Porta / Analytics) rather than navigating away, keeping fleet-wide awareness visible while working one fridge. This is the surface's one deliberate structural departure from the "sidebar + table + detail page" pattern every admin panel defaults to.
+
+**Landing view:** Analytics, not Fridges, mounts at the bare `/master` and `/admin` path for both roles — a report-first landing (stat tiles, by-period chart, top products, peak hours) rather than a resource-list landing. Fridges is a named sidebar destination (`/master/fridges`, `/admin/fridges`), not the entry point. This was a deliberate correction after the surface first shipped with Fridges as the landing.
 
 ### Components (admin-specific)
 - **Sidebar nav:** `rounded-full` active/inactive pill items (same active-pill logic as the customer bottom nav and category pills), ink fill on the active route.
@@ -228,7 +230,11 @@ A second, deliberate world alongside the customer PhoneShell flow, built for the
 - **Analytics:** stat tiles reuse pastel tone fills (mint = volume, lavender = revenue) at admin scale; period/peak-hour charts are flat CSS bar charts in mint/lavender, no charting library, keeping the "flat fills, no gradients" rule from the customer world.
 - **`paymentCredential` handling:** always a blank password-style field, never pre-filled (the API never returns it) — edit mode shows a "change credential" disclosure plus an explicit "remove credential" checkbox rather than implying a value exists.
 
+- **Role-aware shell:** `AdminShell` is one component for both roles, not two — it derives its base path (`/master` vs `/admin`), sidebar label ("Painel Master"/"Painel Admin"), and nav items (Admins directory item only when `role === 'MASTER'`) from `useMe()`. `FridgeFormDialog` is likewise one component with a `hideAdminField` flag, not a forked ADMIN variant.
+
 ### Don't:
-- **Don't** wrap `/master/*` routes in `PhoneShell` — see the Layout "Don't" above.
+- **Don't** wrap `/master/*` or `/admin/*` routes in `PhoneShell` — see the Layout "Don't" above.
 - **Don't** show or imply a current `paymentCredential` value anywhere in the fridge form.
 - **Don't** add a bare delete button for fridges/products/door-open without routing through `ConfirmAction` — these are real, consequential actions.
+- **Don't** re-filter fridge/sale/product lists client-side by owner — the backend already scopes them per role; client-side re-filtering would silently hide a scoping bug instead of surfacing it.
+- **Don't** show the admin-owner picker when an `ADMIN` edits their own fridge — reassigning ownership stays a `MASTER`-only decision even though editing the fridge itself is now allowed.

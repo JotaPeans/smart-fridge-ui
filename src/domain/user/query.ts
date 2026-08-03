@@ -13,7 +13,7 @@ export const useMe = () =>
     retry: false,
   })
 
-export const useAdmins = (search?: string) =>
+export const useAdmins = (search?: string, options?: { enabled?: boolean }) =>
   useQuery({
     queryKey: ['user', 'admins', search ?? ''],
     queryFn: async () => {
@@ -22,4 +22,5 @@ export const useAdmins = (search?: string) =>
       return data
     },
     staleTime: 1000 * 30,
+    enabled: options?.enabled ?? true,
   })

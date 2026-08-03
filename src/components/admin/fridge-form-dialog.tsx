@@ -30,7 +30,7 @@ const schema = z.object({
   name: z.string().min(1, 'Obrigatório').max(255),
   location: z.string().max(255).optional(),
   deviceId: z.string().min(1, 'Obrigatório'),
-  adminId: z.string().min(1, 'Selecione um admin'),
+  adminId: z.string().optional(),
   paymentCredential: z.string().optional(),
   clearCredential: z.boolean().optional(),
 })
@@ -40,13 +40,16 @@ export function FridgeFormDialog({
   open,
   onOpenChange,
   fridge,
+  hideAdminField,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   fridge?: FridgeResponseType
+  /** Hide the admin-owner picker — for an ADMIN editing their own fridge, where reassigning ownership isn't their call. */
+  hideAdminField?: boolean
 }) {
   const isEdit = !!fridge
-  const { data: admins } = useAdmins()
+  const { data: admins } = useAdmins(undefined, { enabled: !hideAdminField })
   const createMutation = useCreateFridgeMutation()
   const updateMutation = useUpdateFridgeMutation()
   const [showCredentialField, setShowCredentialField] = useState(!isEdit)
@@ -85,13 +88,14 @@ export function FridgeFormDialog({
           name: values.name,
           location: values.location || null,
           deviceId: values.deviceId,
-          adminId: values.adminId,
+          adminId: hideAdminField ? undefined : values.adminId,
           paymentCredential: values.clearCredential
             ? null
             : values.paymentCredential || undefined,
         },
       })
     } else {
+      if (!values.adminId) return
       await createMutation.mutateAsync({
         name: values.name,
         location: values.location || undefined,
@@ -140,32 +144,34 @@ export function FridgeFormDialog({
                 <FormInputField label="ID do dispositivo" placeholder="device-001" required {...field} />
               )}
             />
-            <FormField
-              control={form.control}
-              name="adminId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-semibold text-muted-foreground">
-                    Admin responsável <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
-                        <SelectValue placeholder="Selecione um admin" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {admins?.items.map((admin) => (
-                          <SelectItem key={admin.id} value={admin.id}>
-                            {admin.name} · {admin.email}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!hideAdminField && (
+              <FormField
+                control={form.control}
+                name="adminId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-semibold text-muted-foreground">
+                      Admin responsável <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
+                          <SelectValue placeholder="Selecione um admin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {admins?.items.map((admin) => (
+                            <SelectItem key={admin.id} value={admin.id}>
+                              {admin.name} · {admin.email}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {isEdit && !showCredentialField && (
               <button

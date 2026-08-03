@@ -4,17 +4,20 @@ import { authClient } from '#/lib/auth-client.ts'
 import { useMe } from '#/domain/user/query.ts'
 import { cn } from '#/lib/utils.ts'
 
-const NAV_ITEMS = [
-  { to: '/master', label: 'Geladeiras', icon: Refrigerator },
-  { to: '/master/sales', label: 'Vendas', icon: Receipt },
-  { to: '/master/analytics', label: 'Analytics', icon: BarChart3 },
-  { to: '/master/admins', label: 'Admins', icon: ShieldCheck },
-] as const
-
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const { data: user } = useMe()
   const navigate = useNavigate()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
+
+  const isMaster = user?.role === 'MASTER'
+  const base = isMaster ? '/master' : '/admin'
+
+  const navItems = [
+    { to: base, label: 'Analytics', icon: BarChart3 },
+    { to: `${base}/fridges`, label: 'Geladeiras', icon: Refrigerator },
+    { to: `${base}/sales`, label: 'Vendas', icon: Receipt },
+    ...(isMaster ? [{ to: '/master/admins', label: 'Admins', icon: ShieldCheck }] : []),
+  ]
 
   async function handleSignOut() {
     await authClient.signOut()
@@ -32,13 +35,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <p className="truncate text-sm font-extrabold text-foreground">
               Geladeira Inteligente
             </p>
-            <p className="text-xs font-semibold text-muted-foreground">Painel Master</p>
+            <p className="text-xs font-semibold text-muted-foreground">
+              {isMaster ? 'Painel Master' : 'Painel Admin'}
+            </p>
           </div>
         </div>
 
         <nav className="mt-8 flex flex-col gap-1">
-          {NAV_ITEMS.map(({ to, label, icon: Icon }) => {
-            const active = to === '/master' ? pathname === '/master' : pathname.startsWith(to)
+          {navItems.map(({ to, label, icon: Icon }) => {
+            const active = to === base ? pathname === base : pathname.startsWith(to)
             return (
               <Link
                 key={to}
@@ -64,7 +69,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-foreground">
-                {user?.name ?? 'Master'}
+                {user?.name ?? (isMaster ? 'Master' : 'Admin')}
               </p>
               <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
             </div>

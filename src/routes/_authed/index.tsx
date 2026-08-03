@@ -16,9 +16,13 @@ function FridgeEntry() {
   const redirectedRef = useRef(false)
 
   useEffect(() => {
-    if (user?.role === 'MASTER' && !redirectedRef.current) {
+    if (!user || redirectedRef.current) return
+    if (user.role === 'MASTER') {
       redirectedRef.current = true
       navigate({ to: '/master' })
+    } else if (user.role === 'ADMIN') {
+      redirectedRef.current = true
+      navigate({ to: '/admin' })
     }
   }, [user, navigate])
 
@@ -28,7 +32,7 @@ function FridgeEntry() {
     navigate({ to: '/f/$fridgeId', params: { fridgeId: fridgeId.trim() } })
   }
 
-  if (isPending || user?.role === 'MASTER') {
+  if (isPending || user?.role === 'MASTER' || user?.role === 'ADMIN') {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background">
         <div className="size-8 animate-spin rounded-full border-2 border-muted border-t-primary" />

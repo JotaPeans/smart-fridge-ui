@@ -12,11 +12,11 @@ import {
 } from '#/components/ui/select.tsx'
 import { useFridges } from '#/domain/fridge/query.ts'
 
-export const Route = createFileRoute('/_authed/master/analytics/')({
-  component: GlobalAnalytics,
+export const Route = createFileRoute('/_authed/admin/')({
+  component: AdminAnalytics,
 })
 
-function GlobalAnalytics() {
+function AdminAnalytics() {
   const { data: fridges } = useFridges(1, 100)
   const [fridgeId, setFridgeId] = useState<string>('all')
   const [startDate, setStartDate] = useState('')
@@ -28,7 +28,7 @@ function GlobalAnalytics() {
         <div>
           <h1 className="text-2xl font-extrabold text-foreground">Analytics</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Vendas, faturamento e horários de pico em toda a frota.
+            Vendas, faturamento e horários de pico das suas geladeiras.
           </p>
         </div>
 
@@ -38,7 +38,7 @@ function GlobalAnalytics() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas as geladeiras</SelectItem>
+              <SelectItem value="all">Todas as minhas geladeiras</SelectItem>
               {fridges?.items.map((f) => (
                 <SelectItem key={f.id} value={f.id}>
                   {f.name}
