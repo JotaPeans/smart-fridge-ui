@@ -40,7 +40,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         {/*
           THESIS: a vending fridge's checkout compresses into a phone-native tap flow — stock, basket, pay, unlock.
-          OWN-WORLD: near-black ink on cream/white ground, Rubik display weight, pill CTAs, pastel-coded product tiles (mint/lavender/blush/sand).
+          OWN-WORLD: near-black ink on frost/white ground, Rubik display weight, pill CTAs, pastel-coded product tiles (mint/lavender/blush/sand).
           STORY: customer scans QR, sees what's stocked right now, adds one or more products to a basket, pays once, and the door unlocks for pickup.
           FIRST VIEWPORT: greeting + fridge label at top, horizontal category pills, two-column product grid, floating pill tab bar.
           FORM: brief-pinned world from user-supplied reference images (typography/color sheet + 3 app screens); no concept roll run.

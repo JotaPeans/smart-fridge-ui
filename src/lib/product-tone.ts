@@ -1,4 +1,4 @@
-export const TONES = ['mint', 'lavender', 'blush', 'sand', 'cream'] as const
+export const TONES = ['mint', 'lavender', 'blush', 'sand', 'frost'] as const
 export type Tone = (typeof TONES)[number]
 
 export const toneClasses: Record<Tone, string> = {
@@ -6,7 +6,7 @@ export const toneClasses: Record<Tone, string> = {
   lavender: 'bg-lavender',
   blush: 'bg-blush',
   sand: 'bg-sand',
-  cream: 'bg-cream',
+  frost: 'bg-frost',
 }
 
 export function toneForId(id: string): Tone {

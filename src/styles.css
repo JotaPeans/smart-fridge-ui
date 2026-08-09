@@ -8,7 +8,7 @@
 
 :root {
   --ink: #202020;
-  --cream: #ffe8ae;
+  --frost: #d6effa;
   --paper: #ffffff;
   --mint: #eafcd7;
   --lavender: #e8e9ff;
@@ -23,11 +23,11 @@
   --popover-foreground: var(--ink);
   --primary: var(--ink);
   --primary-foreground: var(--paper);
-  --secondary: var(--cream);
+  --secondary: var(--frost);
   --secondary-foreground: var(--ink);
   --muted: #f5f5f3;
   --muted-foreground: #6b6b68;
-  --accent: var(--cream);
+  --accent: var(--frost);
   --accent-foreground: var(--ink);
   --destructive: #d94f4f;
   --destructive-foreground: #ffffff;
@@ -39,7 +39,7 @@
 
 .dark {
   --ink: #f2f2f0;
-  --cream: #4a3f1f;
+  --frost: #21414c;
   --paper: #161616;
   --mint: #263323;
   --lavender: #24243a;
@@ -54,11 +54,11 @@
   --popover-foreground: var(--ink);
   --primary: var(--ink);
   --primary-foreground: #161616;
-  --secondary: var(--cream);
+  --secondary: var(--frost);
   --secondary-foreground: var(--ink);
   --muted: #242422;
   --muted-foreground: #a3a39d;
-  --accent: var(--cream);
+  --accent: var(--frost);
   --accent-foreground: var(--ink);
   --destructive: #e46a6a;
   --destructive-foreground: #161616;
@@ -92,7 +92,7 @@
   --color-lavender: var(--lavender);
   --color-blush: var(--blush);
   --color-sand: var(--sand);
-  --color-cream: var(--cream);
+  --color-frost: var(--frost);
   --radius-sm: calc(var(--radius) - 12px);
   --radius-md: calc(var(--radius) - 6px);
   --radius-lg: var(--radius);

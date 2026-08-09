@@ -4,7 +4,7 @@ description: A phone-native tap-to-unlock checkout for a physical vending fridge
 colors:
   ink: "#202020"
   paper: "#ffffff"
-  cream: "#ffe8ae"
+  frost: "#d6effa"
   mint: "#eafcd7"
   lavender: "#e8e9ff"
   blush: "#ffcdca"
@@ -89,12 +89,12 @@ components:
 
 **Creative North Star: "The Vending Wallet"**
 
-Smart Fridge compresses a physical vending purchase into a single-handed phone flow: near-black ink typeset in Rubik's confident geometric weight sits on a cream-and-white ground, with pastel-coded tiles standing in for a product catalog that doesn't exist yet. There is no browsing chrome, no cart, no multi-step checkout — every screen is a full-bleed phone card carrying exactly one job (browse, decide, pay, unlock). The palette is loud in small, specific places (a pill button, a stock badge, a tone field) and otherwise gets out of the way of black text on white.
+Smart Fridge compresses a physical vending purchase into a single-handed phone flow: near-black ink typeset in Rubik's confident geometric weight sits on a frost-and-white ground, with pastel-coded tiles standing in for a product catalog that doesn't exist yet. There is no browsing chrome, no multi-step checkout — every screen is a full-bleed phone card carrying exactly one job (browse, add to basket, pay, unlock). The palette is loud in small, specific places (a pill button, a stock badge, a tone field) and otherwise gets out of the way of black text on white.
 
-The system was brief-pinned from a Figma type/color spec sheet and three snack-vending app screens; the shipped build honors that pinning almost exactly — same ink/cream/pastel palette, same pill-everything form language, same stepper and bottom-tab patterns — with the one durable adaptation being PhoneShell, which turns the reference's implicit "this is a phone app" into an explicit, enforced layout rule for a real responsive web build.
+The system was brief-pinned from a Figma type/color spec sheet and three snack-vending app screens; the shipped build honors that pinning almost exactly — same ink/pastel palette, same pill-everything form language, same stepper and bottom-tab patterns — with two durable adaptations: PhoneShell, which turns the reference's implicit "this is a phone app" into an explicit, enforced layout rule for a real responsive web build; and swapping the pinned reference's warm cream accent for a cooler frost tone that reads more like the product itself (chilled glass/condensation) than a bakery app.
 
 **Key Characteristics:**
-- Near-black ink (#202020) on white/cream grounds; color is reserved for tone fields, pills, and the primary CTA, never for body text.
+- Near-black ink (#202020) on white/frost grounds; color is reserved for tone fields, pills, and the primary CTA, never for body text.
 - Rubik at heavy weights (700-800) for every heading; body and label text stay at regular/semibold Rubik.
 - Pill radius (full) on every interactive control: buttons, category filters, nav, badges, quantity stepper.
 - Large corner radius (1.25rem+) on every card, sheet, and product tile — nothing in the system has a sharp corner.
@@ -102,16 +102,16 @@ The system was brief-pinned from a Figma type/color spec sheet and three snack-v
 
 ## Colors
 
-The palette is a warm near-monochrome (ink/cream/white) carrying five pastel "tone" fields that exist to color-code product tiles, plus one destructive red for form errors.
+The palette is a cool near-monochrome (ink/frost/white) carrying five pastel "tone" fields that exist to color-code product tiles, plus one destructive red for form errors.
 
 ### Primary
 - **Ink** (`#202020`): the only text, icon-stroke, and primary-surface color in the system — page headings, body copy, primary button fill, active nav icon-well, active category pill. Carries `--primary` and `--foreground`.
 
 ### Secondary
-- **Cream** (`#ffe8ae`): the login hero background and the `--secondary`/`--accent` semantic slot. Reserved for the one full-bleed warm surface in the flow (the sign-in screen), not used as a general accent.
+- **Frost** (`#d6effa`): the login hero background and the `--secondary`/`--accent` semantic slot. Reads as chilled glass/condensation — the one deliberate color association with the physical product. Reserved for the one full-bleed cool surface in the flow (the sign-in screen), not used as a general accent.
 
 ### Tertiary (pastel tone fields)
-- **Mint** (`#eafcd7`), **Lavender** (`#e8e9ff`), **Blush** (`#ffcdca`), **Sand** (`#f2e1d5`): the five-color rotation (mint/lavender/blush/sand/cream) assigned per-product as the tile background behind its placeholder icon, on both the browse grid and the product-detail hero. Also used once each as a full-screen state ground (mint on the unlock-success screen, cream on login) to signal a distinct, non-browsing moment.
+- **Mint** (`#eafcd7`), **Lavender** (`#e8e9ff`), **Blush** (`#ffcdca`), **Sand** (`#f2e1d5`): the five-color rotation (mint/lavender/blush/sand/frost) assigned per-product as the tile background behind its placeholder icon, on both the browse grid and the product-detail hero. Also used once each as a full-screen state ground (mint on the unlock-success screen, frost on login) to signal a distinct, non-browsing moment.
 
 ### Neutral
 - **Paper** (`#ffffff`): default page and card background (`--background`, `--card`).
@@ -167,7 +167,7 @@ Every corner in the system is heavily rounded and nothing is sharp. `--radius: 1
 
 ### Buttons
 - **Shape:** fully circular ends (`rounded-full`); icon-only utility buttons are perfect circles at `size-11`.
-- **Primary:** ink fill, cream/paper text, `h-13`–`h-14` height, used for the sign-in CTA, "Make Payment", and "Done". The payment CTA embeds a circular icon well (`bg-primary-foreground`) at its leading edge — a distinctive pill-with-badge composition unique to the pay action.
+- **Primary:** ink fill, paper text, `h-13`–`h-14` height, used for the sign-in CTA, "Make Payment", and "Done". The payment CTA embeds a circular icon well (`bg-primary-foreground`) at its leading edge — a distinctive pill-with-badge composition unique to the pay action.
 - **Outline:** transparent fill, `border-border` hairline, ink text — used for icon-only secondary actions (filter, back, sign-out) and never carries a text label without an icon.
 - **Hover/Focus:** default shadcn ring/opacity treatment (`focus-visible:ring-ring/50`, `disabled:opacity-50`); no custom hover choreography beyond opacity shifts on the primary payment button while processing.
 
@@ -179,7 +179,7 @@ Every corner in the system is heavily rounded and nothing is sharp. `--radius: 1
 
 ### Cards / Containers
 - **Corner Style:** `rounded-3xl` (product tiles, account info row) to `rounded-[2rem]` (product hero).
-- **Background:** paper for the product-card info area; one pastel tone fill (mint/lavender/blush/sand/cream) for the image-bearing portion of a tile.
+- **Background:** paper for the product-card info area; one pastel tone fill (mint/lavender/blush/sand/frost) for the image-bearing portion of a tile.
 - **Shadow Strategy:** flat at rest (see Elevation & Depth); no card in the system has a resting shadow.
 - **Border:** none — cards are distinguished by fill color against the page background, not by outline.
 - **Internal Padding:** tiles use no internal padding around the tone field (edge-to-edge square); text below sits at `px-0.5 pt-2.5`. Larger containers (account row) use `p-5`.
@@ -201,7 +201,7 @@ A square pastel-tone field with a centered `lucide-react` line icon (stroke 1.5,
 ### Do:
 - **Do** keep every route inside `PhoneShell` — full-bleed under `sm`, centered `max-w-md` card with `2.5rem` corners and ambient shadow at `sm+`. This is the system's responsive strategy, not a temporary constraint.
 - **Do** use `rounded-full` for every tappable control (buttons, pills, badges, nav, stepper) and reserve large-but-not-full radii (`rounded-3xl`/`rounded-[2rem]`) for image-bearing containers.
-- **Do** assign one pastel tone (mint/lavender/blush/sand/cream) per product/state as a flat fill — never gradient or combine tones on one surface.
+- **Do** assign one pastel tone (mint/lavender/blush/sand/frost) per product/state as a flat fill — never gradient or combine tones on one surface.
 - **Do** keep shadows structural: only on the shell, the floating nav, and elements that visually overlap another layer.
 - **Do** set headings and numerals in Rubik 800; leave everything else at 400-600.
 

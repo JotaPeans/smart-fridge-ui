@@ -145,7 +145,7 @@ function DoorTab({ fridge }: { fridge: FridgeResponseType }) {
   return (
     <div className="rounded-2xl bg-background p-6">
       <div className="flex items-center gap-3">
-        <div className="flex size-11 items-center justify-center rounded-full bg-cream text-foreground">
+        <div className="flex size-11 items-center justify-center rounded-full bg-frost text-foreground">
           <LockOpen className="size-5" strokeWidth={2.25} />
         </div>
         <div>

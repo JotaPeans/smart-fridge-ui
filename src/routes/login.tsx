@@ -88,7 +88,7 @@ function LoginPage() {
   }
 
   return (
-    <PhoneShell className="flex flex-col overflow-hidden bg-cream">
+    <PhoneShell className="flex flex-col overflow-hidden bg-frost">
       <div className="flex flex-col px-6 pt-16 pb-10">
         <div className="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
           <Refrigerator className="size-6" strokeWidth={2.25} />

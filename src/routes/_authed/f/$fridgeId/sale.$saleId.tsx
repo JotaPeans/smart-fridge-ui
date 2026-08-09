@@ -23,7 +23,7 @@ const STATUS_COPY: Record<
   AWAITING_PAYMENT: {
     title: 'Aguardando pagamento',
     body: 'Vamos destravar a porta assim que seu pagamento for confirmado.',
-    toneClass: 'bg-cream',
+    toneClass: 'bg-frost',
   },
   PAID: {
     title: 'Pagamento confirmado',
