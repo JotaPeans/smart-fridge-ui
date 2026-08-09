@@ -29,7 +29,7 @@ import type { FridgeResponseType } from '#/domain/fridge/types.ts'
 const schema = z.object({
   name: z.string().min(1, 'Obrigatório').max(255),
   location: z.string().max(255).optional(),
-  deviceId: z.string().min(1, 'Obrigatório'),
+  serialNumber: z.string().min(1, 'Obrigatório'),
   adminId: z.string().optional(),
   paymentCredential: z.string().optional(),
   clearCredential: z.boolean().optional(),
@@ -59,7 +59,7 @@ export function FridgeFormDialog({
     defaultValues: {
       name: fridge?.name ?? '',
       location: fridge?.location ?? '',
-      deviceId: fridge?.deviceId ?? '',
+      serialNumber: fridge?.serialNumber ?? '',
       adminId: fridge?.adminId ?? '',
       paymentCredential: '',
       clearCredential: false,
@@ -71,7 +71,7 @@ export function FridgeFormDialog({
       form.reset({
         name: fridge?.name ?? '',
         location: fridge?.location ?? '',
-        deviceId: fridge?.deviceId ?? '',
+        serialNumber: fridge?.serialNumber ?? '',
         adminId: fridge?.adminId ?? '',
         paymentCredential: '',
         clearCredential: false,
@@ -87,7 +87,7 @@ export function FridgeFormDialog({
         body: {
           name: values.name,
           location: values.location || null,
-          deviceId: values.deviceId,
+          serialNumber: values.serialNumber,
           adminId: hideAdminField ? undefined : values.adminId,
           paymentCredential: values.clearCredential
             ? null
@@ -99,7 +99,7 @@ export function FridgeFormDialog({
       await createMutation.mutateAsync({
         name: values.name,
         location: values.location || undefined,
-        deviceId: values.deviceId,
+        serialNumber: values.serialNumber,
         adminId: values.adminId,
         paymentCredential: values.paymentCredential || undefined,
       })
@@ -139,9 +139,9 @@ export function FridgeFormDialog({
             />
             <FormField
               control={form.control}
-              name="deviceId"
+              name="serialNumber"
               render={({ field }) => (
-                <FormInputField label="ID do dispositivo" placeholder="device-001" required {...field} />
+                <FormInputField label="Número de série" placeholder="SN-001" required {...field} />
               )}
             />
             {!hideAdminField && (

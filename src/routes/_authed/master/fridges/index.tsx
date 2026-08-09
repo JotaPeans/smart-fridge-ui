@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ChevronDown, Pencil, Plus, Power, Search } from 'lucide-react'
 import { AdminShell } from '#/components/admin/admin-shell.tsx'
+import { FridgeConnectionBadge } from '#/components/admin/fridge-connection-badge.tsx'
 import { FridgeFormDialog } from '#/components/admin/fridge-form-dialog.tsx'
 import { FridgeExpandPanel } from '#/components/admin/fridge-expand-panel.tsx'
 import { ConfirmAction } from '#/components/ConfirmAction.tsx'
@@ -104,7 +105,8 @@ function FridgesWorkbench() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Localização</TableHead>
                 <TableHead>Admin</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Conexão</TableHead>
+                <TableHead>Acesso</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -132,8 +134,11 @@ function FridgesWorkbench() {
                       {adminName(fridge.adminId)}
                     </TableCell>
                     <TableCell>
+                      <FridgeConnectionBadge status={fridge.status} />
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={fridge.active ? 'default' : 'outline'}>
-                        {fridge.active ? 'Ativa' : 'Inativa'}
+                        {fridge.active ? 'Desbloqueada' : 'Bloqueada'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
@@ -173,7 +178,7 @@ function FridgesWorkbench() {
                   </TableRow>
                   {expanded === fridge.id && (
                     <TableRow key={`${fridge.id}-expand`} className="hover:bg-transparent">
-                      <TableCell colSpan={6} className="p-0">
+                      <TableCell colSpan={7} className="p-0">
                         <FridgeExpandPanel fridge={fridge} />
                       </TableCell>
                     </TableRow>

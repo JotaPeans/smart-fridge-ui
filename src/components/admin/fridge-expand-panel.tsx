@@ -173,7 +173,7 @@ function DoorTab({ fridge }: { fridge: FridgeResponseType }) {
 
       {!fridge.active && (
         <p className="mt-3 text-xs text-destructive">
-          Esta geladeira está inativa — reative-a para poder destravar a porta.
+          Esta geladeira está bloqueada — reative-a para poder destravar a porta.
         </p>
       )}
     </div>

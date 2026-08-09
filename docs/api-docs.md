@@ -137,7 +137,7 @@ Cria geladeira. **Restrito a MASTER.**
   |---|---|---|---|
   | `name` | string (1–255) | sim | |
   | `location` | string (≤255) \| null | não | |
-  | `deviceId` | string | sim | identificador único do device IoT/MQTT |
+  | `serialNumber` | string | sim | identificador único do device IoT/MQTT |
   | `adminId` | string | sim | id de um usuário com role `ADMIN` |
   | `paymentCredential` | string | não | token do gateway de pagamento (AbacatePay) **dessa geladeira específica**; nunca retorna na response, é armazenado criptografado |
 - **Response 200**: [`FridgeResponse`](#fridgeresponse)
@@ -347,7 +347,8 @@ type VideoStatus = "PENDING" | "UPLOADED" | "FAILED" | "PERMANENTLY_FAILED";
   id: string;
   name: string;
   location: string | null;
-  deviceId: string;
+  serialNumber: string;
+  status: string;
   active: boolean;
   adminId: string;
   createdAt: string;
