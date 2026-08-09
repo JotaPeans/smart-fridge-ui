@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Search } from 'lucide-react'
 import { BottomNav } from '#/components/site/bottom-nav.tsx'
+import { CartBadge } from '#/components/site/cart-badge.tsx'
 import { PhoneShell } from '#/components/site/phone-shell.tsx'
 import { ProductCard } from '#/components/site/product-card.tsx'
 import { Input } from '#/components/ui/input.tsx'
+import { useCart } from '#/domain/cart/store.tsx'
 import { useProducts } from '#/domain/product/query.ts'
 
 export const Route = createFileRoute('/_authed/f/$fridgeId/')({ component: Browse })
@@ -13,6 +15,11 @@ function Browse() {
   const { fridgeId } = Route.useParams()
   const { data, isPending, isError } = useProducts(fridgeId)
   const [search, setSearch] = useState('')
+  const { ensureFridge } = useCart()
+
+  useEffect(() => {
+    ensureFridge(fridgeId)
+  }, [fridgeId, ensureFridge])
 
   const visible = useMemo(() => {
     const items = data?.items ?? []
@@ -24,10 +31,7 @@ function Browse() {
   return (
     <PhoneShell className="pb-32">
       <header className="px-6 pt-12">
-        <h1 className="text-3xl font-extrabold text-foreground">O que você quer?</h1>
-        <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Geladeira {fridgeId}
-        </p>
+        <h1 className="text-3xl font-extrabold text-foreground">O que você busca?</h1>x
       </header>
 
       <div className="mt-5 flex items-center gap-2 rounded-2xl bg-muted px-4 mx-6">
@@ -72,6 +76,7 @@ function Browse() {
         </p>
       )}
 
+      <CartBadge fridgeId={fridgeId} />
       <BottomNav fridgeId={fridgeId} />
     </PhoneShell>
   )

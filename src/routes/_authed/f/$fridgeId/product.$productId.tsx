@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft, Minus, PackageOpen, Plus, ShoppingBasket } from 'lucide-react'
 import { toast } from 'sonner'
+import { CartBadge } from '#/components/site/cart-badge.tsx'
 import { PhoneShell } from '#/components/site/phone-shell.tsx'
+import { useCart } from '#/domain/cart/store.tsx'
 import { useProduct } from '#/domain/product/query.ts'
-import { useCheckoutMutation } from '#/domain/payment/query.ts'
 import { toneClasses, toneForId } from '#/lib/product-tone.ts'
 
 export const Route = createFileRoute('/_authed/f/$fridgeId/product/$productId')({
@@ -15,7 +16,7 @@ function ProductDetail() {
   const { fridgeId, productId } = Route.useParams()
   const navigate = useNavigate()
   const { data: product, isPending, isError } = useProduct(productId)
-  const checkoutMutation = useCheckoutMutation()
+  const cart = useCart()
   const [qty, setQty] = useState(1)
 
   if (isPending) {
@@ -44,17 +45,22 @@ function ProductDetail() {
   const tone = toneForId(product.id)
   const total = (product.price * qty).toFixed(2)
 
-  async function handlePay() {
-    const result = await checkoutMutation.mutateAsync({
+  function handleAddToCart() {
+    if (!product) return
+    const p = product
+    cart.addItem(
       fridgeId,
-      items: [{ productId, quantity: qty }],
-    })
-    if (!result) return
-    navigate({
-      to: '/f/$fridgeId/sale/$saleId',
-      params: { fridgeId, saleId: result.saleId },
-      search: { checkoutUrl: result.checkoutUrl },
-    })
+      {
+        productId: p.id,
+        name: p.name,
+        price: p.price,
+        imageUrl: p.imageUrl,
+      },
+      qty,
+      p.stock,
+    )
+    toast.success(`${p.name} adicionado ao carrinho`)
+    navigate({ to: '/f/$fridgeId', params: { fridgeId } })
   }
 
   return (
@@ -124,22 +130,18 @@ function ProductDetail() {
       <div className="mt-4 px-6">
         <button
           type="button"
-          onClick={() => {
-            handlePay().catch((error: { message?: string }) => {
-              toast.error(error?.message ?? 'Não foi possível iniciar o pagamento')
-            })
-          }}
-          disabled={checkoutMutation.isPending || product.stock === 0}
+          onClick={handleAddToCart}
+          disabled={product.stock === 0}
           className="flex h-14 w-full items-center gap-3 rounded-full bg-primary pl-1.5 pr-6 text-primary-foreground transition-opacity disabled:opacity-70"
         >
           <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-primary">
             <ShoppingBasket className="size-5" strokeWidth={2.25} />
           </span>
-          <span className="flex-1 text-left text-base font-semibold">
-            {checkoutMutation.isPending ? 'Iniciando pagamento…' : 'Pagar'}
-          </span>
+          <span className="flex-1 text-left text-base font-semibold">Adicionar ao carrinho</span>
         </button>
       </div>
+
+      <CartBadge fridgeId={fridgeId} />
     </PhoneShell>
   )
 }

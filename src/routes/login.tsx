@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { Refrigerator } from 'lucide-react'
 import { toast } from 'sonner'
 import { authClient } from '#/lib/auth-client.ts'
+import { queryClient } from '#/lib/query-client.ts'
 import { Button } from '#/components/ui/button.tsx'
 import { Form, FormField } from '#/components/ui/form.tsx'
 import { FormInputField } from '#/components/FormInputField.tsx'
@@ -62,7 +63,11 @@ function LoginPage() {
     setLoading(true)
     const { error } = await authClient.signIn.email(values)
     setLoading(false)
-    if (error) toast.error(error.message ?? 'Algo deu errado. Tente novamente.')
+    if (error) {
+      toast.error(error.message ?? 'Algo deu errado. Tente novamente.')
+      return
+    }
+    queryClient.clear()
   }
 
   async function handleSignUp(values: SignUpValues) {
@@ -75,7 +80,11 @@ function LoginPage() {
       cpf: values.cpf || undefined,
     } as Parameters<typeof authClient.signUp.email>[0])
     setLoading(false)
-    if (error) toast.error(error.message ?? 'Algo deu errado. Tente novamente.')
+    if (error) {
+      toast.error(error.message ?? 'Algo deu errado. Tente novamente.')
+      return
+    }
+    queryClient.clear()
   }
 
   return (

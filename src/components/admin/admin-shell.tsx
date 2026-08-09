@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { BarChart3, LogOut, Refrigerator, Receipt, ShieldCheck } from 'lucide-react'
 import { authClient } from '#/lib/auth-client.ts'
 import { useMe } from '#/domain/user/query.ts'
+import { queryClient } from '#/lib/query-client.ts'
 import { cn } from '#/lib/utils.ts'
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -21,6 +22,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   async function handleSignOut() {
     await authClient.signOut()
+    queryClient.clear()
     navigate({ to: '/login' })
   }
 

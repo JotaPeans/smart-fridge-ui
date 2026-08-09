@@ -21,6 +21,7 @@ import { Route as AuthedAdminFridgesIndexRouteImport } from './routes/_authed/ad
 import { Route as AuthedAdminSalesIndexRouteImport } from './routes/_authed/admin/sales/index'
 import { Route as AuthedAdminSalesSaleIdRouteImport } from './routes/_authed/admin/sales/$saleId'
 import { Route as AuthedFFridgeIdIndexRouteImport } from './routes/_authed/f/$fridgeId/index'
+import { Route as AuthedFFridgeIdCartRouteImport } from './routes/_authed/f/$fridgeId/cart'
 import { Route as AuthedMasterAdminsIndexRouteImport } from './routes/_authed/master/admins/index'
 import { Route as AuthedMasterFridgesIndexRouteImport } from './routes/_authed/master/fridges/index'
 import { Route as AuthedMasterSalesIndexRouteImport } from './routes/_authed/master/sales/index'
@@ -87,6 +88,11 @@ const AuthedFFridgeIdIndexRoute = AuthedFFridgeIdIndexRouteImport.update({
   path: '/f/$fridgeId/',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
+const AuthedFFridgeIdCartRoute = AuthedFFridgeIdCartRouteImport.update({
+  id: '/f/$fridgeId/cart',
+  path: '/f/$fridgeId/cart',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
 const AuthedMasterAdminsIndexRoute = AuthedMasterAdminsIndexRouteImport.update({
   id: '/admins/',
   path: '/admins/',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthedAdminIndexRoute
   '/master/': typeof AuthedMasterIndexRoute
   '/admin/sales/$saleId': typeof AuthedAdminSalesSaleIdRoute
+  '/f/$fridgeId/cart': typeof AuthedFFridgeIdCartRoute
   '/master/sales/$saleId': typeof AuthedMasterSalesSaleIdRoute
   '/admin/fridges/': typeof AuthedAdminFridgesIndexRoute
   '/admin/sales/': typeof AuthedAdminSalesIndexRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthedAdminIndexRoute
   '/master': typeof AuthedMasterIndexRoute
   '/admin/sales/$saleId': typeof AuthedAdminSalesSaleIdRoute
+  '/f/$fridgeId/cart': typeof AuthedFFridgeIdCartRoute
   '/master/sales/$saleId': typeof AuthedMasterSalesSaleIdRoute
   '/admin/fridges': typeof AuthedAdminFridgesIndexRoute
   '/admin/sales': typeof AuthedAdminSalesIndexRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/master/': typeof AuthedMasterIndexRoute
   '/_authed/admin/sales/$saleId': typeof AuthedAdminSalesSaleIdRoute
+  '/_authed/f/$fridgeId/cart': typeof AuthedFFridgeIdCartRoute
   '/_authed/master/sales/$saleId': typeof AuthedMasterSalesSaleIdRoute
   '/_authed/admin/fridges/': typeof AuthedAdminFridgesIndexRoute
   '/_authed/admin/sales/': typeof AuthedAdminSalesIndexRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/master/'
     | '/admin/sales/$saleId'
+    | '/f/$fridgeId/cart'
     | '/master/sales/$saleId'
     | '/admin/fridges/'
     | '/admin/sales/'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/master'
     | '/admin/sales/$saleId'
+    | '/f/$fridgeId/cart'
     | '/master/sales/$saleId'
     | '/admin/fridges'
     | '/admin/sales'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/_authed/admin/'
     | '/_authed/master/'
     | '/_authed/admin/sales/$saleId'
+    | '/_authed/f/$fridgeId/cart'
     | '/_authed/master/sales/$saleId'
     | '/_authed/admin/fridges/'
     | '/_authed/admin/sales/'
@@ -328,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedFFridgeIdIndexRouteImport
       parentRoute: typeof AuthedRouteRoute
     }
+    '/_authed/f/$fridgeId/cart': {
+      id: '/_authed/f/$fridgeId/cart'
+      path: '/f/$fridgeId/cart'
+      fullPath: '/f/$fridgeId/cart'
+      preLoaderRoute: typeof AuthedFFridgeIdCartRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
     '/_authed/master/admins/': {
       id: '/_authed/master/admins/'
       path: '/admins'
@@ -414,6 +433,7 @@ interface AuthedRouteRouteChildren {
   AuthedMasterRouteRoute: typeof AuthedMasterRouteRouteWithChildren
   AuthedAccountRoute: typeof AuthedAccountRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
+  AuthedFFridgeIdCartRoute: typeof AuthedFFridgeIdCartRoute
   AuthedFFridgeIdIndexRoute: typeof AuthedFFridgeIdIndexRoute
   AuthedFFridgeIdProductProductIdRoute: typeof AuthedFFridgeIdProductProductIdRoute
   AuthedFFridgeIdSaleSaleIdRoute: typeof AuthedFFridgeIdSaleSaleIdRoute
@@ -424,6 +444,7 @@ const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedMasterRouteRoute: AuthedMasterRouteRouteWithChildren,
   AuthedAccountRoute: AuthedAccountRoute,
   AuthedIndexRoute: AuthedIndexRoute,
+  AuthedFFridgeIdCartRoute: AuthedFFridgeIdCartRoute,
   AuthedFFridgeIdIndexRoute: AuthedFFridgeIdIndexRoute,
   AuthedFFridgeIdProductProductIdRoute: AuthedFFridgeIdProductProductIdRoute,
   AuthedFFridgeIdSaleSaleIdRoute: AuthedFFridgeIdSaleSaleIdRoute,

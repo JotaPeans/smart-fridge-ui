@@ -3,7 +3,9 @@ import { LogOut } from 'lucide-react'
 import { BottomNav } from '#/components/site/bottom-nav.tsx'
 import { PhoneShell } from '#/components/site/phone-shell.tsx'
 import { authClient } from '#/lib/auth-client.ts'
+import { useCart } from '#/domain/cart/store.tsx'
 import { useMe } from '#/domain/user/query.ts'
+import { queryClient } from '#/lib/query-client.ts'
 import { useSales } from '#/domain/sale/query.ts'
 import { SALE_STATUS_LABEL } from '#/domain/sale/types.ts'
 
@@ -13,9 +15,12 @@ function Account() {
   const { data: user } = useMe()
   const { data: sales, isPending: salesPending } = useSales()
   const navigate = useNavigate()
+  const cart = useCart()
 
   async function handleSignOut() {
     await authClient.signOut()
+    queryClient.clear()
+    cart.clear()
     navigate({ to: '/login' })
   }
 
