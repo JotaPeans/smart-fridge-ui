@@ -24,6 +24,7 @@ import {
 import { Checkbox } from '#/components/ui/checkbox.tsx'
 import { useAdmins } from '#/domain/user/query.ts'
 import { useCreateFridgeMutation, useUpdateFridgeMutation } from '#/domain/fridge/query.ts'
+import { GATEWAY_TYPE_LABEL, GatewayTypeSchema } from '#/domain/fridge/types.ts'
 import type { FridgeResponseType } from '#/domain/fridge/types.ts'
 
 const schema = z.object({
@@ -33,6 +34,8 @@ const schema = z.object({
   adminId: z.string().optional(),
   paymentCredential: z.string().optional(),
   clearCredential: z.boolean().optional(),
+  gatewayType: GatewayTypeSchema,
+  gatewayCardMachineId: z.string().optional(),
 })
 type FormValues = z.infer<typeof schema>
 
@@ -63,8 +66,12 @@ export function FridgeFormDialog({
       adminId: fridge?.adminId ?? '',
       paymentCredential: '',
       clearCredential: false,
+      gatewayType: fridge?.gatewayType ?? 'ABACATEPAY',
+      gatewayCardMachineId: '',
     },
   })
+
+  const gatewayType = form.watch('gatewayType')
 
   useEffect(() => {
     if (open) {
@@ -75,6 +82,8 @@ export function FridgeFormDialog({
         adminId: fridge?.adminId ?? '',
         paymentCredential: '',
         clearCredential: false,
+        gatewayType: fridge?.gatewayType ?? 'ABACATEPAY',
+        gatewayCardMachineId: '',
       })
       setShowCredentialField(!isEdit)
     }
@@ -92,6 +101,11 @@ export function FridgeFormDialog({
           paymentCredential: values.clearCredential
             ? null
             : values.paymentCredential || undefined,
+          gatewayType: values.gatewayType,
+          gatewayCardMachineId:
+            values.gatewayType === 'MERCADOPAGO'
+              ? values.gatewayCardMachineId || undefined
+              : undefined,
         },
       })
     } else {
@@ -102,6 +116,11 @@ export function FridgeFormDialog({
         serialNumber: values.serialNumber,
         adminId: values.adminId,
         paymentCredential: values.paymentCredential || undefined,
+        gatewayType: values.gatewayType,
+        gatewayCardMachineId:
+          values.gatewayType === 'MERCADOPAGO'
+            ? values.gatewayCardMachineId || undefined
+            : undefined,
       })
     }
     onOpenChange(false)
@@ -144,6 +163,49 @@ export function FridgeFormDialog({
                 <FormInputField label="Número de série" placeholder="SN-001" required {...field} />
               )}
             />
+            <FormField
+              control={form.control}
+              name="gatewayType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-semibold text-muted-foreground">
+                    Gateway de pagamento <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
+                        <SelectValue placeholder="Selecione um gateway" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {GatewayTypeSchema.options.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {GATEWAY_TYPE_LABEL[option]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {gatewayType === 'MERCADOPAGO' && (
+              <FormField
+                control={form.control}
+                name="gatewayCardMachineId"
+                render={({ field }) => (
+                  <FormInputField
+                    label="Terminal Point (terminal_id)"
+                    placeholder={
+                      isEdit ? 'Deixe em branco para manter o valor atual' : 'ID do terminal Point Smart'
+                    }
+                    {...field}
+                  />
+                )}
+              />
+            )}
+
             {!hideAdminField && (
               <FormField
                 control={form.control}

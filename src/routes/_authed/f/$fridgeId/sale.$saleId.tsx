@@ -2,16 +2,26 @@ import { useEffect, useRef } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { CircleAlert, CreditCard, LockOpen, PackageCheck, Timer } from 'lucide-react'
 import { PhoneShell } from '#/components/site/phone-shell.tsx'
+import { PixPaymentPanel } from '#/routes/_authed/f/-components/pix-payment-panel.tsx'
+import { TerminalPaymentPanel } from '#/routes/_authed/f/-components/terminal-payment-panel.tsx'
 import { useSalePolling } from '#/domain/sale/query.ts'
 import type { SaleStatus } from '#/domain/sale/types.ts'
 
 interface SaleSearch {
   checkoutUrl?: string
+  pixCode?: string
+  qrCodeBase64?: string
+  expiresAt?: string
+  terminal?: boolean
 }
 
 export const Route = createFileRoute('/_authed/f/$fridgeId/sale/$saleId')({
   validateSearch: (search: Record<string, unknown>): SaleSearch => ({
     checkoutUrl: typeof search.checkoutUrl === 'string' ? search.checkoutUrl : undefined,
+    pixCode: typeof search.pixCode === 'string' ? search.pixCode : undefined,
+    qrCodeBase64: typeof search.qrCodeBase64 === 'string' ? search.qrCodeBase64 : undefined,
+    expiresAt: typeof search.expiresAt === 'string' ? search.expiresAt : undefined,
+    terminal: search.terminal === true,
   }),
   component: SaleStatusPage,
 })
@@ -54,7 +64,7 @@ const STATUS_COPY: Record<
 
 function SaleStatusPage() {
   const { fridgeId, saleId } = Route.useParams()
-  const { checkoutUrl } = Route.useSearch()
+  const { checkoutUrl, pixCode, qrCodeBase64, expiresAt, terminal } = Route.useSearch()
   const navigate = useNavigate()
   const { data: sale, timedOut } = useSalePolling(saleId)
   const openedRef = useRef(false)
@@ -136,6 +146,12 @@ function SaleStatusPage() {
           Abrir página de pagamento
         </a>
       )}
+
+      {sale.status === 'AWAITING_PAYMENT' && pixCode && qrCodeBase64 && expiresAt && (
+        <PixPaymentPanel pixCode={pixCode} qrCodeBase64={qrCodeBase64} expiresAt={expiresAt} />
+      )}
+
+      {sale.status === 'AWAITING_PAYMENT' && terminal && <TerminalPaymentPanel />}
 
       {sale.status === 'CANCELLED' && (
         <button

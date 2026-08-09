@@ -1,20 +1,31 @@
+import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft, Minus, PackageOpen, Plus, ShoppingBasket, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { PhoneShell } from '#/components/site/phone-shell.tsx'
+import { PaymentMethodPicker } from '#/routes/_authed/f/-components/payment-method-picker.tsx'
 import { useCart } from '#/domain/cart/store.tsx'
+import { useFridge } from '#/domain/fridge/query.ts'
 import { useCheckoutMutation } from '#/domain/payment/query.ts'
+import type { PaymentMethodType } from '#/domain/payment/types.ts'
 import { useProducts } from '#/domain/product/query.ts'
 import { toneClasses, toneForId } from '#/lib/product-tone.ts'
 
 export const Route = createFileRoute('/_authed/f/$fridgeId/cart')({ component: Cart })
 
+const METHODS_BY_GATEWAY: Record<'ABACATEPAY' | 'MERCADOPAGO', PaymentMethodType[]> = {
+  ABACATEPAY: ['pix'],
+  MERCADOPAGO: ['pix', 'credito', 'debito'],
+}
+
 function Cart() {
   const { fridgeId } = Route.useParams()
   const navigate = useNavigate()
   const cart = useCart()
+  const { data: fridge } = useFridge(fridgeId)
   const { data: products } = useProducts(fridgeId)
   const checkoutMutation = useCheckoutMutation()
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('pix')
 
   const items = cart.fridgeId === fridgeId ? cart.items : []
   const stockById = new Map(products?.items.map((p) => [p.id, p.stock]) ?? [])
@@ -22,10 +33,13 @@ function Cart() {
     const stock = stockById.get(item.productId)
     return stock !== undefined && item.quantity > stock
   })
+  const availableMethods = fridge ? METHODS_BY_GATEWAY[fridge.gatewayType] : (['pix'] as PaymentMethodType[])
+  const selectedMethod = availableMethods.includes(paymentMethod) ? paymentMethod : 'pix'
 
   async function handlePay() {
     const result = await checkoutMutation.mutateAsync({
       fridgeId,
+      paymentMethod: selectedMethod,
       items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
     })
     if (!result) return
@@ -33,7 +47,12 @@ function Cart() {
     navigate({
       to: '/f/$fridgeId/sale/$saleId',
       params: { fridgeId, saleId: result.saleId },
-      search: { checkoutUrl: result.checkoutUrl },
+      search:
+        result.type === 'redirect'
+          ? { checkoutUrl: result.checkoutUrl }
+          : result.type === 'pix'
+            ? { pixCode: result.pixCode, qrCodeBase64: result.qrCodeBase64, expiresAt: result.expiresAt }
+            : { terminal: true },
     })
   }
 
@@ -136,7 +155,15 @@ function Cart() {
             })}
           </div>
 
-          <div className="mt-auto flex items-baseline justify-between px-6 pt-10">
+          <div className="mt-auto px-6 pt-10">
+            <PaymentMethodPicker
+              methods={availableMethods}
+              value={selectedMethod}
+              onChange={setPaymentMethod}
+            />
+          </div>
+
+          <div className="flex items-baseline justify-between px-6 pt-4">
             <span className="text-sm font-medium text-muted-foreground">Total</span>
             <span className="text-2xl font-extrabold text-foreground">
               R$ {cart.totalPrice.toFixed(2)}
