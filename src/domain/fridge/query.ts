@@ -19,6 +19,7 @@ export const useFridges = (page = 1, pageSize = 20) =>
       return data
     },
     staleTime: 1000 * 30,
+    refetchInterval: 1000 * 15,
   })
 
 export const useFridge = (id: string) =>
