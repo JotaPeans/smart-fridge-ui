@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
 import { Route as AuthedAdminRouteRouteImport } from './routes/_authed/admin/route'
+import { Route as AuthedMapRouteImport } from './routes/_authed/map'
 import { Route as AuthedMasterRouteRouteImport } from './routes/_authed/master/route'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
 import { Route as AuthedFFridgeIdRouteRouteImport } from './routes/_authed/f/$fridgeId/route'
@@ -52,6 +53,11 @@ const AuthedAccountRoute = AuthedAccountRouteImport.update({
 const AuthedAdminRouteRoute = AuthedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+const AuthedMapRoute = AuthedMapRouteImport.update({
+  id: '/map',
+  path: '/map',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 const AuthedMasterRouteRoute = AuthedMasterRouteRouteImport.update({
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthedAdminRouteRouteWithChildren
   '/master': typeof AuthedMasterRouteRouteWithChildren
   '/account': typeof AuthedAccountRoute
+  '/map': typeof AuthedMapRoute
   '/f/$fridgeId': typeof AuthedFFridgeIdRouteRouteWithChildren
   '/admin/': typeof AuthedAdminIndexRoute
   '/master/': typeof AuthedMasterIndexRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/account': typeof AuthedAccountRoute
+  '/map': typeof AuthedMapRoute
   '/': typeof AuthedIndexRoute
   '/admin': typeof AuthedAdminIndexRoute
   '/master': typeof AuthedMasterIndexRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authed/admin': typeof AuthedAdminRouteRouteWithChildren
   '/_authed/master': typeof AuthedMasterRouteRouteWithChildren
   '/_authed/account': typeof AuthedAccountRoute
+  '/_authed/map': typeof AuthedMapRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/f/$fridgeId': typeof AuthedFFridgeIdRouteRouteWithChildren
   '/_authed/admin/': typeof AuthedAdminIndexRoute
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/master'
     | '/account'
+    | '/map'
     | '/f/$fridgeId'
     | '/admin/'
     | '/master/'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/account'
+    | '/map'
     | '/'
     | '/admin'
     | '/master'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/_authed/admin'
     | '/_authed/master'
     | '/_authed/account'
+    | '/_authed/map'
     | '/_authed/'
     | '/_authed/f/$fridgeId'
     | '/_authed/admin/'
@@ -299,6 +311,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthedAdminRouteRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
+    '/_authed/map': {
+      id: '/_authed/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AuthedMapRouteImport
       parentRoute: typeof AuthedRouteRoute
     }
     '/_authed/master': {
@@ -466,6 +485,7 @@ interface AuthedRouteRouteChildren {
   AuthedAdminRouteRoute: typeof AuthedAdminRouteRouteWithChildren
   AuthedMasterRouteRoute: typeof AuthedMasterRouteRouteWithChildren
   AuthedAccountRoute: typeof AuthedAccountRoute
+  AuthedMapRoute: typeof AuthedMapRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedFFridgeIdRouteRoute: typeof AuthedFFridgeIdRouteRouteWithChildren
 }
@@ -474,6 +494,7 @@ const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedAdminRouteRoute: AuthedAdminRouteRouteWithChildren,
   AuthedMasterRouteRoute: AuthedMasterRouteRouteWithChildren,
   AuthedAccountRoute: AuthedAccountRoute,
+  AuthedMapRoute: AuthedMapRoute,
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedFFridgeIdRouteRoute: AuthedFFridgeIdRouteRouteWithChildren,
 }
