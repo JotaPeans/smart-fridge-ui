@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft, Minus, PackageOpen, Plus, ShoppingBasket, Trash2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { PhoneShell } from '#/components/site/phone-shell.tsx'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { PaySliderButton } from '#/routes/_authed/f/-components/pay-slider-button.tsx'
 import { PaymentMethodPicker } from '#/routes/_authed/f/-components/payment-method-picker.tsx'
 import { useCart } from '#/domain/cart/store.tsx'
 import { useFridge } from '#/domain/fridge/query.ts'
@@ -22,6 +22,7 @@ function Cart() {
   const { fridgeId } = Route.useParams()
   const navigate = useNavigate()
   const cart = useCart()
+  const shouldReduceMotion = useReducedMotion()
   const { data: fridge } = useFridge(fridgeId)
   const { data: products } = useProducts(fridgeId)
   const checkoutMutation = useCheckoutMutation()
@@ -57,21 +58,29 @@ function Cart() {
   }
 
   return (
-    <PhoneShell className="flex flex-col pb-10">
+    <div className="flex min-h-dvh flex-col pb-10 sm:min-h-[calc(100dvh-5rem)]">
       <header className="flex items-center justify-between px-6 pt-12">
         <h1 className="text-2xl font-extrabold text-foreground">Carrinho</h1>
         <button
           type="button"
           onClick={() => navigate({ to: '/f/$fridgeId', params: { fridgeId } })}
           aria-label="Voltar"
-          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-transform active:scale-90"
         >
           <ChevronLeft className="size-5" strokeWidth={2.25} />
         </button>
       </header>
 
+      <AnimatePresence mode="wait" initial={false}>
       {items.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
+        <motion.div
+          key="empty"
+          initial={shouldReduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center"
+        >
           <div className="flex size-16 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <ShoppingBasket className="size-7" strokeWidth={1.5} />
           </div>
@@ -79,20 +88,38 @@ function Cart() {
           <button
             type="button"
             onClick={() => navigate({ to: '/f/$fridgeId', params: { fridgeId } })}
-            className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+            className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform active:scale-95"
           >
             Ver produtos
           </button>
-        </div>
+        </motion.div>
       ) : (
-        <>
+        <motion.div
+          key="items"
+          initial={shouldReduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="flex flex-1 flex-col"
+        >
           <div className="mt-6 flex flex-col gap-4 px-6">
+            <AnimatePresence initial={false}>
             {items.map((item) => {
               const tone = toneForId(item.productId)
               const stock = stockById.get(item.productId)
               const overStock = stock !== undefined && item.quantity > stock
               return (
-                <div key={item.productId} className="flex flex-col gap-2">
+                <motion.div
+                  key={item.productId}
+                  layout={!shouldReduceMotion}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={
+                    shouldReduceMotion ? undefined : { opacity: 0, x: -24, transition: { duration: 0.18 } }
+                  }
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col gap-2"
+                >
                   <div className="flex items-center gap-3">
                     <div
                       className={`flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl ${toneClasses[tone]}`}
@@ -128,9 +155,19 @@ function Cart() {
                       >
                         <Minus className="size-3.5" strokeWidth={2.5} />
                       </button>
-                      <span className="min-w-6 text-center text-sm font-extrabold tabular-nums text-foreground">
+                      <motion.span
+                        key={item.quantity}
+                        initial={shouldReduceMotion ? false : { scale: 0.6 }}
+                        animate={{ scale: 1 }}
+                        transition={
+                          shouldReduceMotion
+                            ? { duration: 0 }
+                            : { type: 'spring', stiffness: 600, damping: 20 }
+                        }
+                        className="min-w-6 text-center text-sm font-extrabold tabular-nums text-foreground"
+                      >
                         {item.quantity}
-                      </span>
+                      </motion.span>
                       <button
                         type="button"
                         onClick={() => cart.setQuantity(item.productId, item.quantity + 1, stock)}
@@ -150,9 +187,10 @@ function Cart() {
                       Só restam {stock} em estoque — ajuste a quantidade
                     </p>
                   )}
-                </div>
+                </motion.div>
               )
             })}
+            </AnimatePresence>
           </div>
 
           <div className="mt-auto px-6 pt-10">
@@ -165,32 +203,29 @@ function Cart() {
 
           <div className="flex items-baseline justify-between px-6 pt-4">
             <span className="text-sm font-medium text-muted-foreground">Total</span>
-            <span className="text-2xl font-extrabold text-foreground">
+            <motion.span
+              key={cart.totalPrice}
+              initial={shouldReduceMotion ? false : { scale: 0.94 }}
+              animate={{ scale: 1 }}
+              transition={
+                shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 22 }
+              }
+              className="text-2xl font-extrabold text-foreground"
+            >
               R$ {cart.totalPrice.toFixed(2)}
-            </span>
+            </motion.span>
           </div>
 
           <div className="mt-4 px-6">
-            <button
-              type="button"
-              onClick={() => {
-                handlePay().catch((error: { message?: string }) => {
-                  toast.error(error?.message ?? 'Não foi possível iniciar o pagamento')
-                })
-              }}
-              disabled={checkoutMutation.isPending || hasStockConflict}
-              className="flex h-14 w-full items-center gap-3 rounded-full bg-primary pl-1.5 pr-6 text-primary-foreground transition-opacity disabled:opacity-70"
-            >
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-primary">
-                <ShoppingBasket className="size-5" strokeWidth={2.25} />
-              </span>
-              <span className="flex-1 text-left text-base font-semibold">
-                {checkoutMutation.isPending ? 'Iniciando pagamento…' : 'Pagar'}
-              </span>
-            </button>
+            <PaySliderButton
+              onConfirm={handlePay}
+              disabled={hasStockConflict || !fridge || checkoutMutation.isPending}
+              label={`Deslize para pagar · R$ ${cart.totalPrice.toFixed(2)}`}
+            />
           </div>
-        </>
+        </motion.div>
       )}
-    </PhoneShell>
+      </AnimatePresence>
+    </div>
   )
 }

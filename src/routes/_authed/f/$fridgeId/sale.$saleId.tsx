@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { CircleAlert, CreditCard, LockOpen, PackageCheck, Timer } from 'lucide-react'
-import { PhoneShell } from '#/components/site/phone-shell.tsx'
 import { PixPaymentPanel } from '#/routes/_authed/f/-components/pix-payment-panel.tsx'
 import { TerminalPaymentPanel } from '#/routes/_authed/f/-components/terminal-payment-panel.tsx'
 import { useSalePolling } from '#/domain/sale/query.ts'
@@ -78,7 +77,7 @@ function SaleStatusPage() {
 
   if (timedOut && sale?.status === 'AWAITING_PAYMENT') {
     return (
-      <PhoneShell className="flex flex-col items-center justify-center gap-4 bg-blush px-8 text-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-blush px-8 text-center sm:min-h-[calc(100dvh-5rem)]">
         <div className="flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Timer className="size-7" strokeWidth={2} />
         </div>
@@ -94,15 +93,15 @@ function SaleStatusPage() {
         >
           Voltar
         </button>
-      </PhoneShell>
+      </div>
     )
   }
 
   if (!sale) {
     return (
-      <PhoneShell className="flex min-h-dvh items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center sm:min-h-[calc(100dvh-5rem)]">
         <div className="size-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
-      </PhoneShell>
+      </div>
     )
   }
 
@@ -117,8 +116,8 @@ function SaleStatusPage() {
           : PackageCheck
 
   return (
-    <PhoneShell
-      className={`flex flex-col items-center justify-center gap-1 px-8 text-center ${copy.toneClass}`}
+    <div
+      className={`flex min-h-dvh flex-col items-center justify-center gap-1 px-8 text-center sm:min-h-[calc(100dvh-5rem)] ${copy.toneClass}`}
     >
       <div className="flex size-20 items-center justify-center rounded-full bg-primary text-primary-foreground">
         {sale.status === 'AWAITING_PAYMENT' ? (
@@ -172,6 +171,6 @@ function SaleStatusPage() {
           Concluir
         </button>
       )}
-    </PhoneShell>
+    </div>
   )
 }

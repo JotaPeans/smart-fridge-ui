@@ -16,6 +16,7 @@ import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
 import { Route as AuthedAdminRouteRouteImport } from './routes/_authed/admin/route'
 import { Route as AuthedMasterRouteRouteImport } from './routes/_authed/master/route'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
+import { Route as AuthedFFridgeIdRouteRouteImport } from './routes/_authed/f/$fridgeId/route'
 import { Route as AuthedMasterIndexRouteImport } from './routes/_authed/master/index'
 import { Route as AuthedAdminFridgesIndexRouteImport } from './routes/_authed/admin/fridges/index'
 import { Route as AuthedAdminSalesIndexRouteImport } from './routes/_authed/admin/sales/index'
@@ -63,6 +64,11 @@ const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedAdminRouteRoute,
 } as any)
+const AuthedFFridgeIdRouteRoute = AuthedFFridgeIdRouteRouteImport.update({
+  id: '/f/$fridgeId',
+  path: '/f/$fridgeId',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
 const AuthedMasterIndexRoute = AuthedMasterIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -84,14 +90,14 @@ const AuthedAdminSalesSaleIdRoute = AuthedAdminSalesSaleIdRouteImport.update({
   getParentRoute: () => AuthedAdminRouteRoute,
 } as any)
 const AuthedFFridgeIdIndexRoute = AuthedFFridgeIdIndexRouteImport.update({
-  id: '/f/$fridgeId/',
-  path: '/f/$fridgeId/',
-  getParentRoute: () => AuthedRouteRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedFFridgeIdRouteRoute,
 } as any)
 const AuthedFFridgeIdCartRoute = AuthedFFridgeIdCartRouteImport.update({
-  id: '/f/$fridgeId/cart',
-  path: '/f/$fridgeId/cart',
-  getParentRoute: () => AuthedRouteRoute,
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => AuthedFFridgeIdRouteRoute,
 } as any)
 const AuthedMasterAdminsIndexRoute = AuthedMasterAdminsIndexRouteImport.update({
   id: '/admins/',
@@ -116,15 +122,15 @@ const AuthedMasterSalesSaleIdRoute = AuthedMasterSalesSaleIdRouteImport.update({
 } as any)
 const AuthedFFridgeIdProductProductIdRoute =
   AuthedFFridgeIdProductProductIdRouteImport.update({
-    id: '/f/$fridgeId/product/$productId',
-    path: '/f/$fridgeId/product/$productId',
-    getParentRoute: () => AuthedRouteRoute,
+    id: '/product/$productId',
+    path: '/product/$productId',
+    getParentRoute: () => AuthedFFridgeIdRouteRoute,
   } as any)
 const AuthedFFridgeIdSaleSaleIdRoute =
   AuthedFFridgeIdSaleSaleIdRouteImport.update({
-    id: '/f/$fridgeId/sale/$saleId',
-    path: '/f/$fridgeId/sale/$saleId',
-    getParentRoute: () => AuthedRouteRoute,
+    id: '/sale/$saleId',
+    path: '/sale/$saleId',
+    getParentRoute: () => AuthedFFridgeIdRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthedAdminRouteRouteWithChildren
   '/master': typeof AuthedMasterRouteRouteWithChildren
   '/account': typeof AuthedAccountRoute
+  '/f/$fridgeId': typeof AuthedFFridgeIdRouteRouteWithChildren
   '/admin/': typeof AuthedAdminIndexRoute
   '/master/': typeof AuthedMasterIndexRoute
   '/admin/sales/$saleId': typeof AuthedAdminSalesSaleIdRoute
@@ -173,6 +180,7 @@ export interface FileRoutesById {
   '/_authed/master': typeof AuthedMasterRouteRouteWithChildren
   '/_authed/account': typeof AuthedAccountRoute
   '/_authed/': typeof AuthedIndexRoute
+  '/_authed/f/$fridgeId': typeof AuthedFFridgeIdRouteRouteWithChildren
   '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/master/': typeof AuthedMasterIndexRoute
   '/_authed/admin/sales/$saleId': typeof AuthedAdminSalesSaleIdRoute
@@ -195,6 +203,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/master'
     | '/account'
+    | '/f/$fridgeId'
     | '/admin/'
     | '/master/'
     | '/admin/sales/$saleId'
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/_authed/master'
     | '/_authed/account'
     | '/_authed/'
+    | '/_authed/f/$fridgeId'
     | '/_authed/admin/'
     | '/_authed/master/'
     | '/_authed/admin/sales/$saleId'
@@ -305,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminIndexRouteImport
       parentRoute: typeof AuthedAdminRouteRoute
     }
+    '/_authed/f/$fridgeId': {
+      id: '/_authed/f/$fridgeId'
+      path: '/f/$fridgeId'
+      fullPath: '/f/$fridgeId'
+      preLoaderRoute: typeof AuthedFFridgeIdRouteRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
     '/_authed/master/': {
       id: '/_authed/master/'
       path: '/'
@@ -335,17 +352,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authed/f/$fridgeId/': {
       id: '/_authed/f/$fridgeId/'
-      path: '/f/$fridgeId'
+      path: '/'
       fullPath: '/f/$fridgeId/'
       preLoaderRoute: typeof AuthedFFridgeIdIndexRouteImport
-      parentRoute: typeof AuthedRouteRoute
+      parentRoute: typeof AuthedFFridgeIdRouteRoute
     }
     '/_authed/f/$fridgeId/cart': {
       id: '/_authed/f/$fridgeId/cart'
-      path: '/f/$fridgeId/cart'
+      path: '/cart'
       fullPath: '/f/$fridgeId/cart'
       preLoaderRoute: typeof AuthedFFridgeIdCartRouteImport
-      parentRoute: typeof AuthedRouteRoute
+      parentRoute: typeof AuthedFFridgeIdRouteRoute
     }
     '/_authed/master/admins/': {
       id: '/_authed/master/admins/'
@@ -377,17 +394,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authed/f/$fridgeId/product/$productId': {
       id: '/_authed/f/$fridgeId/product/$productId'
-      path: '/f/$fridgeId/product/$productId'
+      path: '/product/$productId'
       fullPath: '/f/$fridgeId/product/$productId'
       preLoaderRoute: typeof AuthedFFridgeIdProductProductIdRouteImport
-      parentRoute: typeof AuthedRouteRoute
+      parentRoute: typeof AuthedFFridgeIdRouteRoute
     }
     '/_authed/f/$fridgeId/sale/$saleId': {
       id: '/_authed/f/$fridgeId/sale/$saleId'
-      path: '/f/$fridgeId/sale/$saleId'
+      path: '/sale/$saleId'
       fullPath: '/f/$fridgeId/sale/$saleId'
       preLoaderRoute: typeof AuthedFFridgeIdSaleSaleIdRouteImport
-      parentRoute: typeof AuthedRouteRoute
+      parentRoute: typeof AuthedFFridgeIdRouteRoute
     }
   }
 }
@@ -428,15 +445,29 @@ const AuthedMasterRouteRouteChildren: AuthedMasterRouteRouteChildren = {
 const AuthedMasterRouteRouteWithChildren =
   AuthedMasterRouteRoute._addFileChildren(AuthedMasterRouteRouteChildren)
 
+interface AuthedFFridgeIdRouteRouteChildren {
+  AuthedFFridgeIdCartRoute: typeof AuthedFFridgeIdCartRoute
+  AuthedFFridgeIdIndexRoute: typeof AuthedFFridgeIdIndexRoute
+  AuthedFFridgeIdProductProductIdRoute: typeof AuthedFFridgeIdProductProductIdRoute
+  AuthedFFridgeIdSaleSaleIdRoute: typeof AuthedFFridgeIdSaleSaleIdRoute
+}
+
+const AuthedFFridgeIdRouteRouteChildren: AuthedFFridgeIdRouteRouteChildren = {
+  AuthedFFridgeIdCartRoute: AuthedFFridgeIdCartRoute,
+  AuthedFFridgeIdIndexRoute: AuthedFFridgeIdIndexRoute,
+  AuthedFFridgeIdProductProductIdRoute: AuthedFFridgeIdProductProductIdRoute,
+  AuthedFFridgeIdSaleSaleIdRoute: AuthedFFridgeIdSaleSaleIdRoute,
+}
+
+const AuthedFFridgeIdRouteRouteWithChildren =
+  AuthedFFridgeIdRouteRoute._addFileChildren(AuthedFFridgeIdRouteRouteChildren)
+
 interface AuthedRouteRouteChildren {
   AuthedAdminRouteRoute: typeof AuthedAdminRouteRouteWithChildren
   AuthedMasterRouteRoute: typeof AuthedMasterRouteRouteWithChildren
   AuthedAccountRoute: typeof AuthedAccountRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
-  AuthedFFridgeIdCartRoute: typeof AuthedFFridgeIdCartRoute
-  AuthedFFridgeIdIndexRoute: typeof AuthedFFridgeIdIndexRoute
-  AuthedFFridgeIdProductProductIdRoute: typeof AuthedFFridgeIdProductProductIdRoute
-  AuthedFFridgeIdSaleSaleIdRoute: typeof AuthedFFridgeIdSaleSaleIdRoute
+  AuthedFFridgeIdRouteRoute: typeof AuthedFFridgeIdRouteRouteWithChildren
 }
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
@@ -444,10 +475,7 @@ const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedMasterRouteRoute: AuthedMasterRouteRouteWithChildren,
   AuthedAccountRoute: AuthedAccountRoute,
   AuthedIndexRoute: AuthedIndexRoute,
-  AuthedFFridgeIdCartRoute: AuthedFFridgeIdCartRoute,
-  AuthedFFridgeIdIndexRoute: AuthedFFridgeIdIndexRoute,
-  AuthedFFridgeIdProductProductIdRoute: AuthedFFridgeIdProductProductIdRoute,
-  AuthedFFridgeIdSaleSaleIdRoute: AuthedFFridgeIdSaleSaleIdRoute,
+  AuthedFFridgeIdRouteRoute: AuthedFFridgeIdRouteRouteWithChildren,
 }
 
 const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(

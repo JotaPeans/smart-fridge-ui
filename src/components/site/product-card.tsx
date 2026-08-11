@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { PackageOpen, Plus } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useCart } from '#/domain/cart/store.tsx'
 import { toneClasses, toneForId } from '#/lib/product-tone.ts'
 import type { ProductResponseType } from '#/domain/product/types.ts'
@@ -13,6 +14,7 @@ export function ProductCard({
 }) {
   const tone = toneForId(product.id)
   const cart = useCart()
+  const shouldReduceMotion = useReducedMotion()
   const inCartQty =
     cart.fridgeId === fridgeId
       ? (cart.items.find((i) => i.productId === product.id)?.quantity ?? 0)
@@ -58,11 +60,12 @@ export function ProductCard({
       </Link>
 
       {product.stock > 0 && (
-        <button
+        <motion.button
           type="button"
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
+            if (!shouldReduceMotion) cart.requestFly(e.currentTarget.getBoundingClientRect())
             cart.addItem(
               fridgeId,
               {
@@ -75,15 +78,27 @@ export function ProductCard({
               product.stock,
             )
           }}
+          whileTap={shouldReduceMotion ? undefined : { scale: 0.82 }}
+          transition={{ type: 'spring', stiffness: 700, damping: 22 }}
           aria-label={`Adicionar ${product.name} ao carrinho`}
-          className="absolute bottom-[3.75rem] right-2.5 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_24px_-6px_rgba(0,0,0,0.35)] transition-transform active:scale-90"
+          className="absolute bottom-[3.75rem] right-2.5 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_24px_-6px_rgba(0,0,0,0.35)]"
         >
           {inCartQty > 0 ? (
-            <span className="text-xs font-extrabold tabular-nums">{inCartQty}</span>
+            <motion.span
+              key={inCartQty}
+              initial={shouldReduceMotion ? false : { scale: 0.5 }}
+              animate={{ scale: 1 }}
+              transition={
+                shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 600, damping: 18 }
+              }
+              className="text-xs font-extrabold tabular-nums"
+            >
+              {inCartQty}
+            </motion.span>
           ) : (
             <Plus className="size-4" strokeWidth={2.5} />
           )}
-        </button>
+        </motion.button>
       )}
     </div>
   )

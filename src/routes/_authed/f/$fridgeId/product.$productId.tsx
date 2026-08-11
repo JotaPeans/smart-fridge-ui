@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft, Minus, PackageOpen, Plus, ShoppingBasket } from 'lucide-react'
 import { toast } from 'sonner'
-import { CartBadge } from '#/components/site/cart-badge.tsx'
-import { PhoneShell } from '#/components/site/phone-shell.tsx'
 import { useCart } from '#/domain/cart/store.tsx'
 import { useProduct } from '#/domain/product/query.ts'
 import { toneClasses, toneForId } from '#/lib/product-tone.ts'
@@ -21,15 +19,15 @@ function ProductDetail() {
 
   if (isPending) {
     return (
-      <PhoneShell className="flex min-h-dvh items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center sm:min-h-[calc(100dvh-5rem)]">
         <div className="size-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
-      </PhoneShell>
+      </div>
     )
   }
 
   if (isError || !product) {
     return (
-      <PhoneShell className="flex flex-col items-center justify-center gap-4 px-8 text-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-8 text-center sm:min-h-[calc(100dvh-5rem)]">
         <p className="text-sm text-muted-foreground">Este produto não foi encontrado.</p>
         <button
           type="button"
@@ -38,7 +36,7 @@ function ProductDetail() {
         >
           Voltar
         </button>
-      </PhoneShell>
+      </div>
     )
   }
 
@@ -64,14 +62,14 @@ function ProductDetail() {
   }
 
   return (
-    <PhoneShell className="flex flex-col pb-10">
+    <div className="flex min-h-dvh flex-col pb-10 sm:min-h-[calc(100dvh-5rem)]">
       <header className="flex items-center justify-between px-6 pt-12">
         <h1 className="text-2xl font-extrabold text-foreground">{product.name}</h1>
         <button
           type="button"
           onClick={() => navigate({ to: '/f/$fridgeId', params: { fridgeId } })}
           aria-label="Voltar"
-          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-transform active:scale-90"
         >
           <ChevronLeft className="size-5" strokeWidth={2.25} />
         </button>
@@ -140,8 +138,6 @@ function ProductDetail() {
           <span className="flex-1 text-left text-base font-semibold">Adicionar ao carrinho</span>
         </button>
       </div>
-
-      <CartBadge fridgeId={fridgeId} />
-    </PhoneShell>
+    </div>
   )
 }

@@ -1,6 +1,6 @@
 import { cn } from '#/lib/utils.ts'
 
-export function PhoneShell({
+export function PhoneShellFrame({
   children,
   className,
 }: {
@@ -19,4 +19,14 @@ export function PhoneShell({
       </div>
     </div>
   )
+}
+
+export function PhoneShell({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  return <PhoneShellFrame className={className}>{children}</PhoneShellFrame>
 }

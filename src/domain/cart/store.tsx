@@ -1,8 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import type { CartItem } from './types.ts'
+import type { CartFlight, CartItem } from './types.ts'
 
 const STORAGE_KEY = 'smart-fridge:cart'
+export const CART_BADGE_TARGET_ID = 'cart-badge-target'
+const FLIGHT_DOT_SIZE = 32
 
 type CartState = {
   fridgeId: string | null
@@ -24,6 +26,9 @@ type CartContextValue = {
   setQuantity: (productId: string, quantity: number, maxStock?: number) => void
   clear: () => void
   ensureFridge: (fridgeId: string) => void
+  flights: CartFlight[]
+  requestFly: (sourceRect: DOMRect) => void
+  completeFly: (id: number) => void
 }
 
 const CartContext = createContext<CartContextValue | null>(null)
@@ -49,10 +54,36 @@ function resetIfDifferentFridge(prev: CartState, fridgeId: string): CartState {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<CartState>(() => readStorage())
+  const [flights, setFlights] = useState<CartFlight[]>([])
+  const flightIdRef = useRef(0)
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   }, [state])
+
+  const requestFly = useCallback((sourceRect: DOMRect) => {
+    const target = document.getElementById(CART_BADGE_TARGET_ID)?.getBoundingClientRect()
+    if (!target) return
+    const id = flightIdRef.current++
+    setFlights((prev) => [
+      ...prev,
+      {
+        id,
+        from: {
+          x: sourceRect.left + sourceRect.width / 2 - FLIGHT_DOT_SIZE / 2,
+          y: sourceRect.top + sourceRect.height / 2 - FLIGHT_DOT_SIZE / 2,
+        },
+        to: {
+          x: target.left + target.width / 2 - FLIGHT_DOT_SIZE / 2,
+          y: target.top + target.height / 2 - FLIGHT_DOT_SIZE / 2,
+        },
+      },
+    ])
+  }, [])
+
+  const completeFly = useCallback((id: number) => {
+    setFlights((prev) => prev.filter((f) => f.id !== id))
+  }, [])
 
   const ensureFridge = useCallback((fridgeId: string) => {
     setState((prev) => resetIfDifferentFridge(prev, fridgeId))
@@ -121,8 +152,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setQuantity,
       clear,
       ensureFridge,
+      flights,
+      requestFly,
+      completeFly,
     }),
-    [state.fridgeId, state.items, totalCount, totalPrice, addItem, removeItem, setQuantity, clear, ensureFridge],
+    [
+      state.fridgeId,
+      state.items,
+      totalCount,
+      totalPrice,
+      addItem,
+      removeItem,
+      setQuantity,
+      clear,
+      ensureFridge,
+      flights,
+      requestFly,
+      completeFly,
+    ],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
