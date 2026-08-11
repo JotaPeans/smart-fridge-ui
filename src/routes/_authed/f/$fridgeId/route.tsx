@@ -27,7 +27,6 @@ function FridgeLayout() {
   const sub = subPath(location.pathname);
   const depth = routeDepth(sub);
   const isIndex = sub === "";
-  const isProduct = sub.startsWith("product/");
 
   const [prevDepth, setPrevDepth] = useState(depth);
   const [direction, setDirection] = useState(0);
@@ -57,7 +56,7 @@ function FridgeLayout() {
       )}
 
       <CartFlyOverlay flights={cart.flights} onComplete={cart.completeFly} />
-      {(isIndex || isProduct) && <CartBadge fridgeId={fridgeId} />}
+      {isIndex && <CartBadge fridgeId={fridgeId} />}
       {isIndex && <BottomNav fridgeId={fridgeId} />}
     </PhoneShellFrame>
   );

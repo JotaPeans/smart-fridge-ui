@@ -1,13 +1,16 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { Home, User } from 'lucide-react'
+import { useCart } from '#/domain/cart/store.tsx'
 import { cn } from '#/lib/utils.ts'
 
 export function BottomNav({ fridgeId }: { fridgeId?: string }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const cart = useCart()
+  const activeFridgeId = fridgeId ?? cart.fridgeId ?? undefined
 
   const items = [
     {
-      to: fridgeId ? `/f/${fridgeId}` : '/',
+      to: activeFridgeId ? `/f/${activeFridgeId}` : '/',
       icon: Home,
       label: 'Início',
     },

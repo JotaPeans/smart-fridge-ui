@@ -10,7 +10,6 @@ import {
 import { toast } from "sonner";
 import { useCart } from "#/domain/cart/store.tsx";
 import { useProduct } from "#/domain/product/query.ts";
-import { toneClasses, toneForId } from "#/lib/product-tone.ts";
 
 export const Route = createFileRoute("/_authed/f/$fridgeId/product/$productId")(
   {
@@ -50,7 +49,6 @@ function ProductDetail() {
     );
   }
 
-  const tone = toneForId(product.id);
   const total = (product.price * qty).toFixed(2);
 
   function handleAddToCart() {
