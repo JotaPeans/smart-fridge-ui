@@ -1,10 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { distanceKm } from '#/lib/geo.ts'
+import type { GeolocationCoords } from '#/hooks/use-geolocation.ts'
 import {
   createFridge,
   deactivateFridge,
   getFridge,
   listFridges,
+  listPublicFridges,
   openFridgeDoor,
   updateFridge,
 } from './api.ts'
@@ -91,4 +94,23 @@ export const useOpenDoorMutation = () =>
     },
     onSuccess: () => toast.success('Porta destravada'),
     onError: (error: { message: string }) => toast.error(error.message),
+  })
+
+export const useNearbyFridges = (origin: GeolocationCoords | undefined, radiusKm: number) =>
+  useQuery({
+    queryKey: ['fridges', 'nearby'],
+    queryFn: async () => {
+      const { data, error } = await listPublicFridges(1, 100)
+      if (error) throw error
+      return data
+    },
+    enabled: !!origin,
+    staleTime: 1000 * 30,
+    select: (data) => {
+      if (!origin || !data) return []
+      return data.items
+        .map((fridge) => ({ fridge, distanceKm: distanceKm(origin, fridge) }))
+        .filter((entry) => entry.distanceKm <= radiusKm)
+        .sort((a, b) => a.distanceKm - b.distanceKm)
+    },
   })

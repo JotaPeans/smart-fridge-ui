@@ -1,6 +1,11 @@
 import { api, createWrapQuery } from '#/lib/api.ts'
 import type { Paginated } from '#/lib/pagination.ts'
-import type { CreateFridgeType, FridgeResponseType, UpdateFridgeType } from './types.ts'
+import type {
+  CreateFridgeType,
+  FridgeResponseType,
+  PublicFridgeType,
+  UpdateFridgeType,
+} from './types.ts'
 
 export const listFridges = async (page = 1, pageSize = 50) =>
   createWrapQuery(async () => {
@@ -9,6 +14,14 @@ export const listFridges = async (page = 1, pageSize = 50) =>
     })
     return data
   }, 'list-fridges')
+
+export const listPublicFridges = async (page = 1, pageSize = 100) =>
+  createWrapQuery(async () => {
+    const { data } = await api.get<Paginated<PublicFridgeType>>('/fridge/list/public', {
+      params: { page, pageSize },
+    })
+    return data
+  }, 'list-public-fridges')
 
 export const getFridge = async (id: string) =>
   createWrapQuery(async () => {
