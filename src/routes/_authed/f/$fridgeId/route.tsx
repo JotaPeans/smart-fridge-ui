@@ -20,9 +20,6 @@ function routeDepth(sub: string) {
   return sub.split("/").filter(Boolean).length;
 }
 
-// Card is `sm:max-w-md` (28rem); below that it's full viewport width.
-const MAX_CARD_WIDTH = 448;
-
 function FridgeLayout() {
   const { fridgeId } = Route.useParams();
   const location = useLocation();
