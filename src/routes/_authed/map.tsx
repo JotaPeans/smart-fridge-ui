@@ -43,9 +43,12 @@ function MapPage() {
       </header>
 
       {origin && (
-        <div className="mt-4 flex items-center gap-3 px-6">
-          <span className="shrink-0 text-xs font-semibold text-foreground">
-            Raio: {radiusKm}km
+        <div className="mt-4 flex items-center gap-3 rounded-full bg-muted py-2 pr-5 pl-1.5 mx-6">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
+            {radiusKm}
+          </span>
+          <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+            km de raio
           </span>
           <Slider
             value={[radiusKm]}
@@ -90,13 +93,16 @@ function MapPage() {
               {radiusCircle && (
                 <MapGeoJSON
                   data={radiusCircle}
-                  fillPaint={{ 'fill-color': '#dbeafe', 'fill-opacity': 0.35 }}
-                  linePaint={{ 'line-color': '#93c5fd', 'line-width': 1.5, 'line-opacity': 0.7 }}
+                  fillPaint={{ 'fill-color': '#202020', 'fill-opacity': 0.06 }}
+                  linePaint={{ 'line-color': '#202020', 'line-width': 1.5, 'line-opacity': 0.25 }}
                 />
               )}
 
               <MapMarker longitude={origin.lng} latitude={origin.lat}>
-                <MarkerContent className="size-4 rounded-full border-2 border-gray-300 bg-blue-500 shadow-sm" />
+                <MarkerContent className="flex size-8 items-center justify-center">
+                  <span className="absolute inset-0 m-auto size-8 animate-ping rounded-full bg-primary/25" />
+                  <span className="relative size-4 rounded-full border-2 border-white bg-primary shadow-lg" />
+                </MarkerContent>
               </MapMarker>
 
               {nearby?.map(({ fridge, distanceKm }) => (
