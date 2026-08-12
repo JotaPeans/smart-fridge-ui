@@ -93,8 +93,8 @@ function MapPage() {
               {radiusCircle && (
                 <MapGeoJSON
                   data={radiusCircle}
-                  fillPaint={{ 'fill-color': '#202020', 'fill-opacity': 0.06 }}
-                  linePaint={{ 'line-color': '#202020', 'line-width': 1.5, 'line-opacity': 0.25 }}
+                  fillPaint={{ 'fill-color': '#4582d0', 'fill-opacity': 0.08 }}
+                  linePaint={{ 'line-color': '#4582d0', 'line-width': 1.5, 'line-opacity': 0.3 }}
                 />
               )}
 

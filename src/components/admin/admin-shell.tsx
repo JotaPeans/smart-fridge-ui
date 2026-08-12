@@ -4,6 +4,7 @@ import { authClient } from '#/lib/auth-client.ts'
 import { useMe } from '#/domain/user/query.ts'
 import { queryClient } from '#/lib/query-client.ts'
 import { cn } from '#/lib/utils.ts'
+import Logo from '#/components/icon/Logo.tsx'
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const { data: user } = useMe()
@@ -29,18 +30,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh bg-muted">
       <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-background px-4 py-6">
-        <div className="flex items-center gap-2.5 px-2">
-          <div className="flex size-9 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-            <Refrigerator className="size-4.5" strokeWidth={2.25} />
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold text-foreground">
-              Geladeira Inteligente
-            </p>
-            <p className="text-xs font-semibold text-muted-foreground">
-              {isMaster ? 'Painel Master' : 'Painel Admin'}
-            </p>
-          </div>
+        <div className="px-2">
+          <Logo className="h-9 w-auto" />
+          <p className="mt-1.5 text-xs font-semibold text-muted-foreground">
+            {isMaster ? 'Painel Master' : 'Painel Admin'}
+          </p>
         </div>
 
         <nav className="mt-8 flex flex-col gap-1">

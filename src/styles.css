@@ -8,7 +8,8 @@
 
 :root {
   --ink: #202020;
-  --frost: #d6effa;
+  --principal: #4582d0;
+  --frost: #ebf2fe;
   --paper: #ffffff;
   --mint: #eafcd7;
   --lavender: #e8e9ff;
@@ -21,7 +22,7 @@
   --card-foreground: var(--ink);
   --popover: var(--paper);
   --popover-foreground: var(--ink);
-  --primary: var(--ink);
+  --primary: var(--principal);
   --primary-foreground: var(--paper);
   --secondary: var(--frost);
   --secondary-foreground: var(--ink);
@@ -33,13 +34,14 @@
   --destructive-foreground: #ffffff;
   --border: #ececea;
   --input: #ececea;
-  --ring: var(--ink);
+  --ring: var(--principal);
   --radius: 1.25rem;
 }
 
 .dark {
   --ink: #f2f2f0;
-  --frost: #21414c;
+  --principal: #6e9dda;
+  --frost: #1c2d45;
   --paper: #161616;
   --mint: #263323;
   --lavender: #24243a;
@@ -52,7 +54,7 @@
   --card-foreground: var(--ink);
   --popover: #1e1e1e;
   --popover-foreground: var(--ink);
-  --primary: var(--ink);
+  --primary: var(--principal);
   --primary-foreground: #161616;
   --secondary: var(--frost);
   --secondary-foreground: var(--ink);
@@ -64,7 +66,7 @@
   --destructive-foreground: #161616;
   --border: #2a2a28;
   --input: #2a2a28;
-  --ring: var(--ink);
+  --ring: var(--principal);
 }
 
 @theme inline {
@@ -93,6 +95,7 @@
   --color-blush: var(--blush);
   --color-sand: var(--sand);
   --color-frost: var(--frost);
+  --color-principal: var(--principal);
   --radius-sm: calc(var(--radius) - 12px);
   --radius-md: calc(var(--radius) - 6px);
   --radius-lg: var(--radius);

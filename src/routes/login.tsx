@@ -3,7 +3,6 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Refrigerator } from 'lucide-react'
 import { toast } from 'sonner'
 import { authClient } from '#/lib/auth-client.ts'
 import { queryClient } from '#/lib/query-client.ts'
@@ -11,6 +10,7 @@ import { Button } from '#/components/ui/button.tsx'
 import { Form, FormField } from '#/components/ui/form.tsx'
 import { FormInputField } from '#/components/FormInputField.tsx'
 import { PhoneShell } from '#/components/site/phone-shell.tsx'
+import Logo from '#/components/icon/Logo.tsx'
 
 interface LoginSearch {
   redirect?: string
@@ -46,7 +46,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (session) navigate({ to: redirect ?? '/' })
+    if (session) navigate({ to: redirect ?? '/map' })
   }, [session, redirect, navigate])
 
   const signInForm = useForm<SignInValues>({
@@ -89,11 +89,9 @@ function LoginPage() {
 
   return (
     <PhoneShell className="flex flex-col overflow-hidden bg-frost">
-      <div className="flex flex-col px-6 pt-16 pb-10">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-          <Refrigerator className="size-6" strokeWidth={2.25} />
-        </div>
-        <h1 className="mt-6 text-4xl font-extrabold leading-tight text-foreground">
+      <div className="flex flex-col px-6 pt-12 pb-10">
+        <Logo className="h-12 w-auto" />
+        <h1 className="mt-8 text-4xl font-extrabold leading-tight text-foreground">
           Escaneie. Pegue.
           <br />
           Saia.
@@ -103,7 +101,7 @@ function LoginPage() {
         </p>
       </div>
 
-      <div className="flex flex-1 flex-col rounded-t-[2.5rem] bg-background px-6 pt-8 pb-28">
+      <div className="flex flex-1 flex-col rounded-t-[2.5rem] bg-background px-6 pt-8 pb-4">
         <div className="mb-6 flex gap-2 rounded-full bg-muted p-1">
           <button
             type="button"

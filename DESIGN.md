@@ -3,8 +3,9 @@ name: Smart Fridge
 description: A phone-native tap-to-unlock checkout for a physical vending fridge — stock, pay, unlock, nothing else.
 colors:
   ink: "#202020"
+  principal: "#4582d0"
   paper: "#ffffff"
-  frost: "#d6effa"
+  frost: "#ebf2fe"
   mint: "#eafcd7"
   lavender: "#e8e9ff"
   blush: "#ffcdca"
@@ -48,13 +49,13 @@ spacing:
   xl: "2.5rem"
 components:
   button-primary:
-    backgroundColor: "{colors.ink}"
+    backgroundColor: "{colors.principal}"
     textColor: "{colors.paper}"
     rounded: "{rounded.full}"
     padding: "0 1.5rem"
     height: "3.25rem"
   button-primary-hover:
-    backgroundColor: "{colors.ink}"
+    backgroundColor: "{colors.principal}"
   button-outline:
     backgroundColor: "transparent"
     textColor: "{colors.ink}"
@@ -62,7 +63,7 @@ components:
     padding: "0 1rem"
     height: "2.75rem"
   category-pill-active:
-    backgroundColor: "{colors.ink}"
+    backgroundColor: "{colors.principal}"
     textColor: "{colors.paper}"
     rounded: "{rounded.full}"
     padding: "0.5rem 1rem"
@@ -89,12 +90,12 @@ components:
 
 **Creative North Star: "The Vending Wallet"**
 
-Smart Fridge compresses a physical vending purchase into a single-handed phone flow: near-black ink typeset in Rubik's confident geometric weight sits on a frost-and-white ground, with pastel-coded tiles standing in for a product catalog that doesn't exist yet. There is no browsing chrome, no multi-step checkout — every screen is a full-bleed phone card carrying exactly one job (browse, add to basket, pay, unlock). The palette is loud in small, specific places (a pill button, a stock badge, a tone field) and otherwise gets out of the way of black text on white.
+Smart Fridge compresses a physical vending purchase into a single-handed phone flow: near-black ink typeset in Rubik's confident geometric weight sits on a frost-and-white ground, with pastel-coded tiles standing in for a product catalog that doesn't exist yet. There is no browsing chrome, no multi-step checkout — every screen is a full-bleed phone card carrying exactly one job (browse, add to basket, pay, unlock). Ink still carries every word of text; a single brand blue — **Principal** (`#4582d0`) — now carries the system's action and identity role instead of ink: every primary button, active pill, active nav icon-well, and focus ring, plus the wordmark on the sign-in screen.
 
-The system was brief-pinned from a Figma type/color spec sheet and three snack-vending app screens; the shipped build honors that pinning almost exactly — same ink/pastel palette, same pill-everything form language, same stepper and bottom-tab patterns — with two durable adaptations: PhoneShell, which turns the reference's implicit "this is a phone app" into an explicit, enforced layout rule for a real responsive web build; and swapping the pinned reference's warm cream accent for a cooler frost tone that reads more like the product itself (chilled glass/condensation) than a bakery app.
+The system was brief-pinned from a Figma type/color spec sheet and three snack-vending app screens; the shipped build honors that pinning almost exactly — same pastel palette, same pill-everything form language, same stepper and bottom-tab patterns — with three durable adaptations: PhoneShell, which turns the reference's implicit "this is a phone app" into an explicit, enforced layout rule for a real responsive web build; a cooler frost tone that reads more like the product itself (chilled glass/condensation) than a bakery app; and a brand pass that introduced **Principal** blue as the system's action color, replacing ink in that role and retiring the placeholder icon-well mark in favor of the real logotype (`components/icon/Logo.tsx`) on the sign-in screen.
 
 **Key Characteristics:**
-- Near-black ink (#202020) on white/frost grounds; color is reserved for tone fields, pills, and the primary CTA, never for body text.
+- Near-black ink (#202020) on white/frost grounds for all text; Principal blue (#4582d0) carries every action and brand moment — buttons, active pills/nav, focus rings, the logo — never body text.
 - Rubik at heavy weights (700-800) for every heading; body and label text stay at regular/semibold Rubik.
 - Pill radius (full) on every interactive control: buttons, category filters, nav, badges, quantity stepper.
 - Large corner radius (1.25rem+) on every card, sheet, and product tile — nothing in the system has a sharp corner.
@@ -102,13 +103,16 @@ The system was brief-pinned from a Figma type/color spec sheet and three snack-v
 
 ## Colors
 
-The palette is a cool near-monochrome (ink/frost/white) carrying five pastel "tone" fields that exist to color-code product tiles, plus one destructive red for form errors.
+The palette pairs a near-black ink for text with a single brand blue for action/identity, a frost-tinted cool surface, and five pastel "tone" fields that exist to color-code product tiles, plus one destructive red for form errors.
 
-### Primary
-- **Ink** (`#202020`): the only text, icon-stroke, and primary-surface color in the system — page headings, body copy, primary button fill, active nav icon-well, active category pill. Carries `--primary` and `--foreground`.
+### Primary (text)
+- **Ink** (`#202020`): the only text and icon-stroke color in the system — page headings, body copy, muted-foreground aside. Carries `--foreground`. No longer the action color (see Principal).
+
+### Brand / Action
+- **Principal** (`#4582d0`): the system's brand and action color — primary button fill, active category pill, active bottom-nav/sidebar icon-well, focus ring, and the sign-in logotype. Carries `--primary` and `--ring`. Reserved for actionable and brand moments; never used for body text or as a full-bleed background.
 
 ### Secondary
-- **Frost** (`#d6effa`): the login hero background and the `--secondary`/`--accent` semantic slot. Reads as chilled glass/condensation — the one deliberate color association with the physical product. Reserved for the one full-bleed cool surface in the flow (the sign-in screen), not used as a general accent.
+- **Frost** (`rgb(235, 242, 254)` / `#ebf2fe`): the brand's light surface tone — the login hero background and the `--secondary`/`--accent` semantic slot. Reads as chilled glass/condensation, tuned to sit alongside Principal. Reserved for the one full-bleed cool surface in the flow (the sign-in screen) and the tone-field rotation, not used as a general accent.
 
 ### Tertiary (pastel tone fields)
 - **Mint** (`#eafcd7`), **Lavender** (`#e8e9ff`), **Blush** (`#ffcdca`), **Sand** (`#f2e1d5`): the five-color rotation (mint/lavender/blush/sand/frost) assigned per-product as the tile background behind its placeholder icon, on both the browse grid and the product-detail hero. Also used once each as a full-screen state ground (mint on the unlock-success screen, frost on login) to signal a distinct, non-browsing moment.
@@ -121,7 +125,9 @@ The palette is a cool near-monochrome (ink/frost/white) carrying five pastel "to
 - **Destructive** (`#d94f4f`): form-validation error text only.
 
 ### Named Rules
-**The Ink-Only-Text Rule.** Body and heading text are always `--foreground` (near-black) or `--muted-foreground`; pastel tokens never carry text, only fills behind icons or full-screen state grounds.
+**The Ink-Only-Text Rule.** Body and heading text are always `--foreground` (near-black) or `--muted-foreground`; Principal and the pastel tokens never carry text, only control fills, icon strokes-on-fill, or full-screen state grounds.
+
+**The Principal-Is-Action Rule.** Principal blue appears only on things a user can act on or that signal identity (buttons, active pills/nav, focus rings, the logo) — never as page background, card fill, or a second text color.
 
 **The One Pastel Per Surface Rule.** Any given tile or screen uses exactly one tone color as a flat fill — tones are never combined, gradiented, or layered on the same surface.
 
@@ -167,13 +173,13 @@ Every corner in the system is heavily rounded and nothing is sharp. `--radius: 1
 
 ### Buttons
 - **Shape:** fully circular ends (`rounded-full`); icon-only utility buttons are perfect circles at `size-11`.
-- **Primary:** ink fill, paper text, `h-13`–`h-14` height, used for the sign-in CTA, "Make Payment", and "Done". The payment CTA embeds a circular icon well (`bg-primary-foreground`) at its leading edge — a distinctive pill-with-badge composition unique to the pay action.
+- **Primary:** Principal blue fill, paper text, `h-13`–`h-14` height, used for the sign-in CTA, "Make Payment", and "Done". The payment CTA embeds a circular icon well (`bg-primary-foreground`) at its leading edge — a distinctive pill-with-badge composition unique to the pay action.
 - **Outline:** transparent fill, `border-border` hairline, ink text — used for icon-only secondary actions (filter, back, sign-out) and never carries a text label without an icon.
 - **Hover/Focus:** default shadcn ring/opacity treatment (`focus-visible:ring-ring/50`, `disabled:opacity-50`); no custom hover choreography beyond opacity shifts on the primary payment button while processing.
 
 ### Chips / Pills (signature pattern)
-- **Category pills:** horizontally scrollable row, `rounded-full`, `bg-muted`/muted-foreground text when inactive, `bg-primary`/primary-foreground when active — the system's filter control.
-- **Sign-in/sign-up segmented pill:** two-button toggle inside a `rounded-full bg-muted p-1` track, active segment gets the ink fill — the same active/inactive pill logic reused as a mode switch.
+- **Category pills:** horizontally scrollable row, `rounded-full`, `bg-muted`/muted-foreground text when inactive, `bg-primary`/primary-foreground (Principal blue) when active — the system's filter control.
+- **Sign-in/sign-up segmented pill:** two-button toggle inside a `rounded-full bg-muted p-1` track, active segment gets the Principal fill — the same active/inactive pill logic reused as a mode switch.
 - **Stock badge:** small `rounded-full bg-background/80` chip overlaid on a product tile corner, shown only when stock ≤ 3 ("N left").
 - **Location chip:** `rounded-full bg-muted` chip pairing a map-pin icon with the fridge location, under the browse greeting.
 
@@ -190,8 +196,11 @@ Every corner in the system is heavily rounded and nothing is sharp. `--radius: 1
 - **Error:** destructive-red inline text below the form, no field-level red border observed.
 
 ### Navigation
-- **Bottom tab bar:** a floating pill (`rounded-full bg-primary`) fixed above the safe area, containing two circular icon targets (Home, Account) at `size-11`; the active destination gets an inverted (paper-fill, ink-icon) circle, inactive icons sit at 70% opacity primary-foreground. Exactly two destinations — no more were added after the duplicate-destination fix.
+- **Bottom tab bar:** a floating pill (`rounded-full bg-primary`, Principal blue) fixed above the safe area, containing two circular icon targets (Home, Account) at `size-11`; the active destination gets an inverted (paper-fill, Principal-icon) circle, inactive icons sit at 70% opacity primary-foreground. Exactly two destinations — no more were added after the duplicate-destination fix.
 - **Header back/filter controls:** circular outline buttons in the top corners of a screen, never a text-labeled back button.
+
+### Brand Mark
+- **Logo** (`components/icon/Logo.tsx`): the real wordmark, fixed Principal-blue fill, rendered once — atop the sign-in hero, replacing the earlier icon-well placeholder (a plain `Refrigerator` glyph in a rounded ink square). Every other screen still uses functional `lucide-react` icons (nav, empty states, markers), not the wordmark — the logo marks the identity moment, not every fridge-adjacent icon.
 
 ### Product Tile (signature component)
 A square pastel-tone field with a centered `lucide-react` line icon (stroke 1.5, `size-14`–`size-28` depending on context) standing in for product photography, topped optionally by a stock-remaining pill. Below the tile: product name (semibold), muted description, and bold price in a two-column split. This icon-on-pastel pattern is a disclosed placeholder — see Do's and Don'ts.
@@ -216,14 +225,14 @@ A square pastel-tone field with a centered `lucide-react` line icon (stroke 1.5,
 
 A second, deliberate world alongside the customer PhoneShell flow, shared by two roles at two permission levels (PRODUCT.md): `MASTER` — a small internal team on desktop managing the whole fridge fleet: creating/editing/deactivating any fridge, assigning `ADMIN` owners, managing per-fridge products, reading cross-fleet sales and analytics, an admins directory, and manual door-open — and `ADMIN` — an owner of one or more fridges, auto-routed to `/admin` instead of `/master`, seeing the identical world scoped to only their own fridges: they can edit (but not create or deactivate) their fridge, fully manage its products, open its door, and read its sales/analytics, with no admins-directory access. The backend scopes list/detail data server-side (an `ADMIN`'s `GET /fridge/list` only ever returns their own); the client's job is hiding actions that role can't call (create/deactivate fridge, the admins nav item) and hiding the admin-owner picker on their own fridge's edit form, not re-filtering data. Auto-routed by role immediately after login (`/master` or `/admin`); `USER` never sees either, and neither back-office role ever sees the customer flow.
 
-**Same brand, different register.** The admin surface inherits DESIGN.md's palette (ink/paper/muted/border, the five pastel tones used sparingly as stat-tile and chart fills), Rubik type, and the pill-control/large-radius shape language above — but trades PhoneShell's single phone-card constraint for a fluid, desktop-first, data-dense Operate layout: a fixed 16rem sidebar (nav + user menu) and a fluid content column (`max-w-[1400px]`), because this audience's job is scanning tables and comparing numbers, not a one-handed tap flow.
+**Same brand, different register.** The admin surface inherits DESIGN.md's palette (ink text, Principal blue for action/selection, paper/muted/border neutrals, the five pastel tones used sparingly as stat-tile and chart fills), Rubik type, and the pill-control/large-radius shape language above — but trades PhoneShell's single phone-card constraint for a fluid, desktop-first, data-dense Operate layout: a fixed 16rem sidebar (nav + user menu) and a fluid content column (`max-w-[1400px]`), because this audience's job is scanning tables and comparing numbers, not a one-handed tap flow.
 
 **Structural direction (per `new-work.md`'s surface concept-seed roll, not a default admin-panel choice):** the Fridges page is a single continuous list — no separate fridge-detail route. Selecting a fridge expands its table row in place into a tabbed panel (Produtos / Porta / Analytics) rather than navigating away, keeping fleet-wide awareness visible while working one fridge. This is the surface's one deliberate structural departure from the "sidebar + table + detail page" pattern every admin panel defaults to.
 
 **Landing view:** Analytics, not Fridges, mounts at the bare `/master` and `/admin` path for both roles — a report-first landing (stat tiles, by-period chart, top products, peak hours) rather than a resource-list landing. Fridges is a named sidebar destination (`/master/fridges`, `/admin/fridges`), not the entry point. This was a deliberate correction after the surface first shipped with Fridges as the landing.
 
 ### Components (admin-specific)
-- **Sidebar nav:** `rounded-full` active/inactive pill items (same active-pill logic as the customer bottom nav and category pills), ink fill on the active route.
+- **Sidebar nav:** `rounded-full` active/inactive pill items (same active-pill logic as the customer bottom nav and category pills), Principal blue fill on the active route.
 - **Tables:** shadcn `table` primitives, `rounded-3xl border-border` container, row click expands/navigates; no card-per-row pattern — data density over decoration.
 - **Forms:** shadcn `dialog` (create/edit fridge, create/edit product) reusing `FormInputField` and the `bg-muted rounded-2xl` input style from the customer login form — same field language, admin-scale forms.
 - **Destructive/physical actions:** every deactivate and the manual door-open action route through `ConfirmAction` (shadcn `alert-dialog`) — these mutate real records or open a real physical door, never a bare button.
