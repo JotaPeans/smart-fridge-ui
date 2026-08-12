@@ -22,13 +22,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select.tsx'
-import { Checkbox } from '#/components/ui/checkbox.tsx'
 import { LocationPickerDialog } from '#/components/admin/location-picker-dialog.tsx'
 import { useAdmins } from '#/domain/user/query.ts'
 import { useCreateFridgeMutation, useUpdateFridgeMutation } from '#/domain/fridge/query.ts'
-import { GATEWAY_TYPE_LABEL, GatewayTypeSchema } from '#/domain/fridge/types.ts'
+import {
+  CNPJ_REGEX,
+  GATEWAY_TYPE_LABEL,
+  GatewayTypeSchema,
+  NFC_PLATFORM_LABEL,
+  NfcPlatformSchema,
+  REGIME_TRIBUTARIO_LABEL,
+  RegimeTributarioSchema,
+} from '#/domain/fridge/types.ts'
 import type { FridgeResponseType } from '#/domain/fridge/types.ts'
 import { geocodeCep } from '#/lib/geo.ts'
+import { cn } from '#/lib/utils.ts'
+import { maskCep, maskCnpj } from '#/lib/masks.ts'
 
 const schema = z.object({
   name: z.string().min(1, 'Obrigatório').max(255),
@@ -47,13 +56,20 @@ const schema = z.object({
     .refine((v) => !Number.isNaN(Number(v)) && Number(v) >= -180 && Number(v) <= 180, 'Deve ser entre -180 e 180'),
   serialNumber: z.string().min(1, 'Obrigatório'),
   adminId: z.string().optional(),
+  cnpj: z.string().regex(CNPJ_REGEX, 'CNPJ inválido'),
+  regimeTributario: RegimeTributarioSchema,
+  nfcPlatform: NfcPlatformSchema.optional(),
   paymentCredential: z.string().optional(),
-  clearCredential: z.boolean().optional(),
   gatewayType: GatewayTypeSchema,
   gatewayCardMachineId: z.string().optional(),
 })
 type FormValues = z.infer<typeof schema>
 
+/**
+ * Handles fridge creation (a two-step wizard: identificação/localização → fiscal/pagamento)
+ * and editing of general attributes only. Fiscal/pagamento for an existing fridge is edited
+ * separately via `FridgeFinancialFormDialog`, reachable from its own table action.
+ */
 export function FridgeFormDialog({
   open,
   onOpenChange,
@@ -70,9 +86,13 @@ export function FridgeFormDialog({
   const { data: admins } = useAdmins(undefined, { enabled: !hideAdminField })
   const createMutation = useCreateFridgeMutation()
   const updateMutation = useUpdateFridgeMutation()
-  const [showCredentialField, setShowCredentialField] = useState(!isEdit)
   const [isGeocoding, setIsGeocoding] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [step, setStep] = useState<1 | 2>(1)
+
+  const isWizard = !isEdit
+  const showStep1 = isEdit || step === 1
+  const showStep2 = isWizard && step === 2
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -84,8 +104,10 @@ export function FridgeFormDialog({
       lng: fridge ? String(fridge.lng) : '',
       serialNumber: fridge?.serialNumber ?? '',
       adminId: fridge?.adminId ?? '',
+      cnpj: fridge?.cnpj ?? '',
+      regimeTributario: fridge?.regimeTributario ?? 'MEI',
+      nfcPlatform: fridge?.nfcPlatform ?? undefined,
       paymentCredential: '',
-      clearCredential: false,
       gatewayType: fridge?.gatewayType ?? 'ABACATEPAY',
       gatewayCardMachineId: '',
     },
@@ -105,14 +127,28 @@ export function FridgeFormDialog({
         lng: fridge ? String(fridge.lng) : '',
         serialNumber: fridge?.serialNumber ?? '',
         adminId: fridge?.adminId ?? '',
+        cnpj: fridge?.cnpj ?? '',
+        regimeTributario: fridge?.regimeTributario ?? 'MEI',
+        nfcPlatform: fridge?.nfcPlatform ?? undefined,
         paymentCredential: '',
-        clearCredential: false,
         gatewayType: fridge?.gatewayType ?? 'ABACATEPAY',
         gatewayCardMachineId: '',
       })
-      setShowCredentialField(!isEdit)
+      setStep(1)
     }
-  }, [open, fridge, isEdit, form])
+  }, [open, fridge, form])
+
+  async function handleNext() {
+    const fields: (keyof FormValues)[] = ['name', 'location', 'cep', 'lat', 'lng', 'serialNumber']
+    if (!hideAdminField) fields.push('adminId')
+    const valid = await form.trigger(fields)
+    if (!valid) return
+    if (!hideAdminField && !form.getValues('adminId')) {
+      form.setError('adminId', { message: 'Selecione um admin' })
+      return
+    }
+    setStep(2)
+  }
 
   async function handleCepBlur(cep: string) {
     const digits = cep.replace(/\D/g, '')
@@ -145,16 +181,8 @@ export function FridgeFormDialog({
           cep,
           lat: latNumber,
           lng: lngNumber,
-          serialNumber: values.serialNumber,
+          serialNumber: hideAdminField ? undefined : values.serialNumber,
           adminId: hideAdminField ? undefined : values.adminId,
-          paymentCredential: values.clearCredential
-            ? null
-            : values.paymentCredential || undefined,
-          gatewayType: values.gatewayType,
-          gatewayCardMachineId:
-            values.gatewayType === 'MERCADOPAGO'
-              ? values.gatewayCardMachineId || undefined
-              : undefined,
         },
       })
     } else {
@@ -167,6 +195,9 @@ export function FridgeFormDialog({
         lng: lngNumber,
         serialNumber: values.serialNumber,
         adminId: values.adminId,
+        cnpj: values.cnpj,
+        regimeTributario: values.regimeTributario,
+        nfcPlatform: values.nfcPlatform,
         paymentCredential: values.paymentCredential || undefined,
         gatewayType: values.gatewayType,
         gatewayCardMachineId:
@@ -185,232 +216,351 @@ export function FridgeFormDialog({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
-            <DialogHeader>
-            <DialogTitle>{isEdit ? 'Editar geladeira' : 'Nova geladeira'}</DialogTitle>
+          <DialogHeader>
+            <DialogTitle>
+              {isEdit ? 'Editar geladeira' : `Nova geladeira · Etapa ${step} de 2`}
+            </DialogTitle>
             <DialogDescription>
               {isEdit
-                ? 'Atualize as informações desta geladeira.'
-                : 'Preencha os dados para cadastrar uma nova geladeira.'}
+                ? 'Atualize a identificação e a localização desta geladeira.'
+                : step === 1
+                  ? 'Identificação, localização e admin responsável.'
+                  : 'Dados fiscais, NFC-e e pagamento.'}
             </DialogDescription>
           </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormInputField label="Nome" placeholder="Geladeira Lobby" required {...field} />
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormInputField label="Localização" placeholder="Térreo, ao lado da recepção" {...field} />
-                )}
-              />
+          {isWizard && (
+            <div className="flex gap-1.5">
+              <div className={cn('h-1 flex-1 rounded-full', step >= 1 ? 'bg-primary' : 'bg-muted')} />
+              <div className={cn('h-1 flex-1 rounded-full', step >= 2 ? 'bg-primary' : 'bg-muted')} />
+            </div>
+          )}
 
-              {hideAdminField ? (
+          <Form {...form}>
+            <form
+              onSubmit={(e) => {
+                if (isWizard && step === 1) {
+                  e.preventDefault()
+                  handleNext()
+                  return
+                }
+                form.handleSubmit(onSubmit)(e)
+              }}
+              className="flex flex-col gap-4"
+            >
+              {showStep1 && (
                 <>
                   <FormField
                     control={form.control}
-                    name="cep"
+                    name="name"
+                    render={({ field }) => (
+                      <FormInputField label="Nome" placeholder="Geladeira Lobby" required {...field} />
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormInputField label="Localização" placeholder="Térreo, ao lado da recepção" {...field} />
+                    )}
+                  />
+
+                  {hideAdminField ? (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="cep"
+                        render={({ field }) => (
+                          <FormInputField
+                            label="CEP"
+                            placeholder="01310-100"
+                            required
+                            {...field}
+                            onChange={(e) => field.onChange(maskCep(e.target.value))}
+                            onBlur={(e) => {
+                              field.onBlur()
+                              handleCepBlur(e.target.value)
+                            }}
+                          />
+                        )}
+                      />
+
+                      <div className="flex items-center justify-between rounded-2xl bg-muted px-4 py-3">
+                        <div className="text-sm">
+                          {isGeocoding ? (
+                            <span className="text-muted-foreground">Buscando localização…</span>
+                          ) : hasCoords ? (
+                            <span className="text-muted-foreground">
+                              {Number(lat).toFixed(6)}, {Number(lng).toFixed(6)}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">Informe o CEP para localizar no mapa</span>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="rounded-full"
+                          disabled={!hasCoords}
+                          onClick={() => setPickerOpen(true)}
+                        >
+                          <MapPin className="size-3.5" />
+                          Ajustar no mapa
+                        </Button>
+                      </div>
+                      {(form.formState.errors.lat || form.formState.errors.lng) && (
+                        <p className="text-xs text-destructive">Selecione a localização no mapa.</p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-3">
+                      <FormField
+                        control={form.control}
+                        name="cep"
+                        render={({ field }) => (
+                          <FormInputField
+                            label="CEP"
+                            placeholder="01310-100"
+                            required
+                            {...field}
+                            onChange={(e) => field.onChange(maskCep(e.target.value))}
+                          />
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="lat"
+                        render={({ field }) => (
+                          <FormInputField label="Latitude" type="number" step="any" required {...field} />
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="lng"
+                        render={({ field }) => (
+                          <FormInputField label="Longitude" type="number" step="any" required {...field} />
+                        )}
+                      />
+                    </div>
+                  )}
+
+                  <FormField
+                    control={form.control}
+                    name="serialNumber"
                     render={({ field }) => (
                       <FormInputField
-                        label="CEP"
-                        placeholder="01310-100"
+                        label="Número de série"
+                        placeholder="SN-001"
                         required
+                        disabled={hideAdminField}
                         {...field}
-                        onBlur={(e) => {
-                          field.onBlur()
-                          handleCepBlur(e.target.value)
-                        }}
                       />
                     )}
                   />
+                  {hideAdminField && (
+                    <p className="-mt-2 text-xs text-muted-foreground">
+                      Apenas o master pode alterar o número de série.
+                    </p>
+                  )}
 
-                  <div className="flex items-center justify-between rounded-2xl bg-muted px-4 py-3">
-                    <div className="text-sm">
-                      {isGeocoding ? (
-                        <span className="text-muted-foreground">Buscando localização…</span>
-                      ) : hasCoords ? (
-                        <span className="text-muted-foreground">
-                          {Number(lat).toFixed(6)}, {Number(lng).toFixed(6)}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">Informe o CEP para localizar no mapa</span>
+                  {!hideAdminField && (
+                    <FormField
+                      control={form.control}
+                      name="adminId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-semibold text-muted-foreground">
+                            Admin responsável <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
+                                <SelectValue placeholder="Selecione um admin" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {admins?.items.map((admin) => (
+                                  <SelectItem key={admin.id} value={admin.id}>
+                                    {admin.name} · {admin.email}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </div>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="rounded-full"
-                      disabled={!hasCoords}
-                      onClick={() => setPickerOpen(true)}
-                    >
-                      <MapPin className="size-3.5" />
-                      Ajustar no mapa
-                    </Button>
-                  </div>
-                  {(form.formState.errors.lat || form.formState.errors.lng) && (
-                    <p className="text-xs text-destructive">Selecione a localização no mapa.</p>
+                    />
                   )}
                 </>
-              ) : (
-                <div className="grid grid-cols-3 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="cep"
-                    render={({ field }) => (
-                      <FormInputField label="CEP" placeholder="01310-100" required {...field} />
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lat"
-                    render={({ field }) => (
-                      <FormInputField label="Latitude" type="number" step="any" required {...field} />
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lng"
-                    render={({ field }) => (
-                      <FormInputField label="Longitude" type="number" step="any" required {...field} />
-                    )}
-                  />
-                </div>
               )}
 
-              <FormField
-                control={form.control}
-                name="serialNumber"
-                render={({ field }) => (
-                  <FormInputField label="Número de série" placeholder="SN-001" required {...field} />
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="gatewayType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold text-muted-foreground">
-                      Gateway de pagamento <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
-                          <SelectValue placeholder="Selecione um gateway" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {GatewayTypeSchema.options.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {GATEWAY_TYPE_LABEL[option]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {showStep2 && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="cnpj"
+                    render={({ field }) => (
+                      <FormInputField
+                        label="CNPJ"
+                        placeholder="00.000.000/0000-00"
+                        required
+                        {...field}
+                        onChange={(e) => field.onChange(maskCnpj(e.target.value))}
+                      />
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="regimeTributario"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-semibold text-muted-foreground">
+                          Regime tributário <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
+                              <SelectValue placeholder="Selecione o regime tributário" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {RegimeTributarioSchema.options.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {REGIME_TRIBUTARIO_LABEL[option]}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="nfcPlatform"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-semibold text-muted-foreground">
+                          Plataforma de NFC-e
+                        </FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value ?? 'NONE'}
+                            onValueChange={(value) => field.onChange(value === 'NONE' ? undefined : value)}
+                          >
+                            <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
+                              <SelectValue placeholder="Selecione uma plataforma" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="NONE">Não configurada</SelectItem>
+                              {NfcPlatformSchema.options.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {NFC_PLATFORM_LABEL[option]}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              {gatewayType === 'MERCADOPAGO' && (
-                <FormField
-                  control={form.control}
-                  name="gatewayCardMachineId"
-                  render={({ field }) => (
-                    <FormInputField
-                      label="Terminal Point (terminal_id)"
-                      placeholder={
-                        isEdit ? 'Deixe em branco para manter o valor atual' : 'ID do terminal Point Smart'
-                      }
-                      {...field}
+                  <FormField
+                    control={form.control}
+                    name="gatewayType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-semibold text-muted-foreground">
+                          Gateway de pagamento <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
+                              <SelectValue placeholder="Selecione um gateway" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {GatewayTypeSchema.options.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {GATEWAY_TYPE_LABEL[option]}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {gatewayType === 'MERCADOPAGO' && (
+                    <FormField
+                      control={form.control}
+                      name="gatewayCardMachineId"
+                      render={({ field }) => (
+                        <FormInputField
+                          label="Terminal Point (terminal_id)"
+                          placeholder="ID do terminal Point Smart"
+                          {...field}
+                        />
+                      )}
                     />
                   )}
-                />
-              )}
 
-              {!hideAdminField && (
-                <FormField
-                  control={form.control}
-                  name="adminId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-semibold text-muted-foreground">
-                        Admin responsável <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger className="h-12 w-full rounded-2xl border-none bg-muted px-4">
-                            <SelectValue placeholder="Selecione um admin" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {admins?.items.map((admin) => (
-                              <SelectItem key={admin.id} value={admin.id}>
-                                {admin.name} · {admin.email}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {isEdit && !showCredentialField && (
-                <button
-                  type="button"
-                  onClick={() => setShowCredentialField(true)}
-                  className="self-start text-sm font-semibold text-primary underline-offset-4 hover:underline"
-                >
-                  Alterar credencial de pagamento
-                </button>
-              )}
-
-              {showCredentialField && (
-                <FormField
-                  control={form.control}
-                  name="paymentCredential"
-                  render={({ field }) => (
-                    <FormInputField
-                      label="Credencial de pagamento (opcional)"
-                      type="password"
-                      placeholder={
-                        isEdit ? 'Deixe em branco para manter o valor atual' : 'Token do gateway'
-                      }
-                      {...field}
-                    />
-                  )}
-                />
-              )}
-
-              {isEdit && (
-                <FormField
-                  control={form.control}
-                  name="clearCredential"
-                  render={({ field }) => (
-                    <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                      Remover credencial de pagamento existente
-                    </label>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="paymentCredential"
+                    render={({ field }) => (
+                      <FormInputField
+                        label="Credencial de pagamento (opcional)"
+                        type="password"
+                        placeholder="Token do gateway"
+                        {...field}
+                      />
+                    )}
+                  />
+                </>
               )}
 
               <DialogFooter>
-                <Button
-                  type="submit"
-                  disabled={pending}
-                  className="h-11 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-                >
-                  {pending ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar geladeira'}
-                </Button>
+                {isWizard && step === 1 && (
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    className="h-11 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    Avançar
+                  </Button>
+                )}
+                {isWizard && step === 2 && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setStep(1)}
+                      className="h-11 rounded-full px-6 text-sm font-semibold"
+                    >
+                      Voltar
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={pending}
+                      className="h-11 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                    >
+                      {pending ? 'Salvando…' : 'Criar geladeira'}
+                    </Button>
+                  </>
+                )}
+                {!isWizard && (
+                  <Button
+                    type="submit"
+                    disabled={pending}
+                    className="h-11 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    {pending ? 'Salvando…' : 'Salvar alterações'}
+                  </Button>
+                )}
               </DialogFooter>
             </form>
           </Form>

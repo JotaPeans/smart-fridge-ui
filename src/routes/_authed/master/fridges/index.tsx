@@ -1,9 +1,10 @@
 import { Fragment, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ChevronDown, Pencil, Plus, Power, Search } from 'lucide-react'
+import { ChevronDown, Pencil, Plus, Power, Search, Wallet } from 'lucide-react'
 import { AdminShell } from '#/components/admin/admin-shell.tsx'
 import { FridgeConnectionBadge } from '#/components/admin/fridge-connection-badge.tsx'
 import { FridgeFormDialog } from '#/components/admin/fridge-form-dialog.tsx'
+import { FridgeFinancialFormDialog } from '#/components/admin/fridge-financial-form-dialog.tsx'
 import { FridgeExpandPanel } from '#/components/admin/fridge-expand-panel.tsx'
 import { ConfirmAction } from '#/components/ConfirmAction.tsx'
 import { PaginationBar } from '#/components/admin/pagination-bar.tsx'
@@ -40,8 +41,12 @@ function FridgesWorkbench() {
   const [search, setSearch] = useState('')
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<FridgeResponseType | undefined>(undefined)
+  const [financialOpen, setFinancialOpen] = useState(false)
+  const [editingFinancial, setEditingFinancial] = useState<FridgeResponseType | undefined>(undefined)
 
   const adminName = (id: string) => admins?.items.find((a) => a.id === id)?.name ?? id
+
+  const PLACEHOLDER_CNPJ = '00.000.000/0000-00'
 
   const visible = data?.items.filter((f) =>
     search.trim() ? f.name.toLowerCase().includes(search.trim().toLowerCase()) : true,
@@ -105,6 +110,7 @@ function FridgesWorkbench() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Localização</TableHead>
                 <TableHead>Admin</TableHead>
+                <TableHead>CNPJ</TableHead>
                 <TableHead>Conexão</TableHead>
                 <TableHead>Acesso</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
@@ -133,6 +139,16 @@ function FridgesWorkbench() {
                     <TableCell className="text-muted-foreground">
                       {adminName(fridge.adminId)}
                     </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        {fridge.cnpj}
+                        {fridge.cnpj === PLACEHOLDER_CNPJ && (
+                          <Badge variant="outline" className="text-amber-600 border-amber-600/40">
+                            Pendente de revisão
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <FridgeConnectionBadge status={fridge.status} />
                     </TableCell>
@@ -154,6 +170,18 @@ function FridgesWorkbench() {
                           }}
                         >
                           <Pencil className="size-3.5" />
+                        </Button>
+                        <Button
+                          size="icon-sm"
+                          variant="outline"
+                          className="rounded-full"
+                          aria-label="Editar dados financeiros"
+                          onClick={() => {
+                            setEditingFinancial(fridge)
+                            setFinancialOpen(true)
+                          }}
+                        >
+                          <Wallet className="size-3.5" />
                         </Button>
                         <ConfirmAction
                           trigger={
@@ -178,7 +206,7 @@ function FridgesWorkbench() {
                   </TableRow>
                   {expanded === fridge.id && (
                     <TableRow key={`${fridge.id}-expand`} className="hover:bg-transparent">
-                      <TableCell colSpan={7} className="p-0">
+                      <TableCell colSpan={8} className="p-0">
                         <FridgeExpandPanel fridge={fridge} />
                       </TableCell>
                     </TableRow>
@@ -199,6 +227,14 @@ function FridgesWorkbench() {
       )}
 
       <FridgeFormDialog open={formOpen} onOpenChange={setFormOpen} fridge={editing} />
+
+      {editingFinancial && (
+        <FridgeFinancialFormDialog
+          open={financialOpen}
+          onOpenChange={setFinancialOpen}
+          fridge={editingFinancial}
+        />
+      )}
     </AdminShell>
   )
 }

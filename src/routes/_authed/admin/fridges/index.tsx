@@ -1,9 +1,10 @@
 import { Fragment, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ChevronDown, Pencil, Search } from 'lucide-react'
+import { ChevronDown, Pencil, Search, Wallet } from 'lucide-react'
 import { AdminShell } from '#/components/admin/admin-shell.tsx'
 import { FridgeConnectionBadge } from '#/components/admin/fridge-connection-badge.tsx'
 import { FridgeFormDialog } from '#/components/admin/fridge-form-dialog.tsx'
+import { FridgeFinancialFormDialog } from '#/components/admin/fridge-financial-form-dialog.tsx'
 import { FridgeExpandPanel } from '#/components/admin/fridge-expand-panel.tsx'
 import { PaginationBar } from '#/components/admin/pagination-bar.tsx'
 import { Button } from '#/components/ui/button.tsx'
@@ -36,10 +37,14 @@ function AdminFridgesWorkbench() {
   const [search, setSearch] = useState('')
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<FridgeResponseType | undefined>(undefined)
+  const [financialOpen, setFinancialOpen] = useState(false)
+  const [editingFinancial, setEditingFinancial] = useState<FridgeResponseType | undefined>(undefined)
 
   const visible = data?.items.filter((f) =>
     search.trim() ? f.name.toLowerCase().includes(search.trim().toLowerCase()) : true,
   )
+
+  const PLACEHOLDER_CNPJ = '00.000.000/0000-00'
 
   function toggleExpand(id: string) {
     navigate({ search: (prev) => ({ ...prev, expanded: prev.expanded === id ? undefined : id }) })
@@ -88,6 +93,7 @@ function AdminFridgesWorkbench() {
                 <TableHead className="w-10" />
                 <TableHead>Nome</TableHead>
                 <TableHead>Localização</TableHead>
+                <TableHead>CNPJ</TableHead>
                 <TableHead>Conexão</TableHead>
                 <TableHead>Acesso</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
@@ -109,6 +115,16 @@ function AdminFridgesWorkbench() {
                     <TableCell className="text-muted-foreground">
                       {fridge.location ?? '—'}
                     </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        {fridge.cnpj}
+                        {fridge.cnpj === PLACEHOLDER_CNPJ && (
+                          <Badge variant="outline" className="text-amber-600 border-amber-600/40">
+                            Pendente de revisão
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <FridgeConnectionBadge status={fridge.status} />
                     </TableCell>
@@ -118,23 +134,37 @@ function AdminFridgesWorkbench() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        size="icon-sm"
-                        variant="outline"
-                        className="rounded-full"
-                        aria-label="Editar geladeira"
-                        onClick={() => {
-                          setEditing(fridge)
-                          setFormOpen(true)
-                        }}
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="icon-sm"
+                          variant="outline"
+                          className="rounded-full"
+                          aria-label="Editar geladeira"
+                          onClick={() => {
+                            setEditing(fridge)
+                            setFormOpen(true)
+                          }}
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                        <Button
+                          size="icon-sm"
+                          variant="outline"
+                          className="rounded-full"
+                          aria-label="Editar dados financeiros"
+                          onClick={() => {
+                            setEditingFinancial(fridge)
+                            setFinancialOpen(true)
+                          }}
+                        >
+                          <Wallet className="size-3.5" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                   {expanded === fridge.id && (
                     <TableRow className="hover:bg-transparent">
-                      <TableCell colSpan={6} className="p-0">
+                      <TableCell colSpan={7} className="p-0">
                         <FridgeExpandPanel fridge={fridge} />
                       </TableCell>
                     </TableRow>
@@ -160,6 +190,14 @@ function AdminFridgesWorkbench() {
         fridge={editing}
         hideAdminField
       />
+
+      {editingFinancial && (
+        <FridgeFinancialFormDialog
+          open={financialOpen}
+          onOpenChange={setFinancialOpen}
+          fridge={editingFinancial}
+        />
+      )}
     </AdminShell>
   )
 }

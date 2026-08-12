@@ -11,6 +11,7 @@ import { Form, FormField } from '#/components/ui/form.tsx'
 import { FormInputField } from '#/components/FormInputField.tsx'
 import { PhoneShell } from '#/components/site/phone-shell.tsx'
 import Logo from '#/components/icon/Logo.tsx'
+import { maskCpf, maskPhone } from '#/lib/masks.ts'
 
 interface LoginSearch {
   redirect?: string
@@ -176,14 +177,26 @@ function LoginPage() {
                 control={signUpForm.control}
                 name="phone"
                 render={({ field }) => (
-                  <FormInputField label="Telefone" type="tel" placeholder="+55 11 99999-9999" required {...field} />
+                  <FormInputField
+                    label="Telefone"
+                    type="tel"
+                    placeholder="(11) 99999-9999"
+                    required
+                    {...field}
+                    onChange={(e) => field.onChange(maskPhone(e.target.value))}
+                  />
                 )}
               />
               <FormField
                 control={signUpForm.control}
                 name="cpf"
                 render={({ field }) => (
-                  <FormInputField label="CPF (opcional)" placeholder="000.000.000-00" {...field} />
+                  <FormInputField
+                    label="CPF (opcional)"
+                    placeholder="000.000.000-00"
+                    {...field}
+                    onChange={(e) => field.onChange(maskCpf(e.target.value))}
+                  />
                 )}
               />
               <FormField

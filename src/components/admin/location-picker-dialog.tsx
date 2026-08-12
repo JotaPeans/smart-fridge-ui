@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { MapPin } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -45,11 +46,19 @@ export function LocationPickerDialog({
               longitude={position.lng}
               latitude={position.lat}
               draggable
+              anchor="bottom"
               onDragEnd={({ lng: nextLng, lat: nextLat }) =>
                 setPosition({ lat: nextLat, lng: nextLng })
               }
             >
-              <MarkerContent />
+              <MarkerContent>
+                <MapPin
+                  className="size-9 text-primary drop-shadow-md"
+                  fill="currentColor"
+                  stroke="white"
+                  strokeWidth={1.5}
+                />
+              </MarkerContent>
             </MapMarker>
           </Map>
         </div>
